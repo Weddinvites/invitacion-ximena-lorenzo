@@ -78,7 +78,7 @@ export function ConfirmacionInvitado({ guest, companion }) {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const r = await confirmarAsistencia(guest.id_invitado);
+      const r = await confirmarAsistencia(guest.slug);
       if (r.ok) {
         setConfirmed(true);
         if (typeof window !== "undefined" && typeof window.confetti === "function") {

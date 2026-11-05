@@ -25,6 +25,7 @@ npm run dev    # http://localhost:3000
 | Variable | Descripción |
 |---|---|
 | `API_URL` | URL base de boda-restapi, sin `/api`. Solo se usa en el servidor. |
+| `EVENTO_ID` | Id del evento en la API (Ximena & Lorenzo = `7`). Si el invitado es de otro evento, la página responde 404 y no se puede confirmar. |
 
 ## Estructura
 

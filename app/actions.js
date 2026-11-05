@@ -1,17 +1,21 @@
 "use server";
 
-import { apiUrl } from "./lib/api";
+import { apiUrl, getInvitadoDelEvento } from "./lib/api";
 
-/** Botón "Aceptar" de la invitación (endpoint público de boda-restapi). */
-export async function confirmarAsistencia(idInvitado) {
-  const id = Number(idInvitado);
-  if (!Number.isInteger(id) || id <= 0) return { ok: false };
+/**
+ * Botón "Aceptar" de la invitación.
+ * Recibe el slug (no el id) y vuelve a validar en el servidor que el invitado
+ * pertenezca a este evento antes de llamar a PUT /api/invitados/confirmar.
+ */
+export async function confirmarAsistencia(slug) {
+  const guest = await getInvitadoDelEvento(String(slug ?? ""));
+  if (!guest) return { ok: false };
 
   try {
     const res = await fetch(apiUrl("/invitados/confirmar"), {
       method: "PUT",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id: guest.id_invitado }),
       cache: "no-store",
     });
     return { ok: res.ok };
