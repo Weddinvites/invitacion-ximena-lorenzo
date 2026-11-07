@@ -11,8 +11,8 @@ admin central: https://admin.weddinvites.com
 | `/` | Invitación general, sin pase ni confirmación |
 | `/[slug]` | Invitación personalizada: nombre, pases y botón **Aceptar** para confirmar. Si el slug no existe, responde 404 |
 
-`/[slug]` consulta `GET /api/invitados/info/:slug` y, si el invitado es tipo pareja, también `GET /api/acompanantes/:id`.
-**Aceptar** llama a `PUT /api/invitados/confirmar` desde un Server Action (`app/actions.js`).
+`/[slug]` consulta `GET /api/eventos/:EVENTO_ID/invitados/:slug` (incluye la pareja, si la hay).
+**Aceptar** llama a `PUT /api/eventos/:EVENTO_ID/invitados/:slug/confirmar` desde un Server Action (`app/actions.js`).
 
 ## Desarrollo
 
@@ -25,7 +25,7 @@ npm run dev    # http://localhost:3000
 | Variable | Descripción |
 |---|---|
 | `API_URL` | URL base de boda-restapi, sin `/api`. Solo se usa en el servidor. |
-| `EVENTO_ID` | Id del evento en la API (Ximena & Lorenzo = `7`). Si el invitado es de otro evento, la página responde 404 y no se puede confirmar. |
+| `EVENTO_ID` | Id del evento en la API (Ximena & Lorenzo = `7`). La API solo responde invitados de ese evento: un slug de otra boda da 404 y no se puede confirmar. |
 
 ## Estructura
 

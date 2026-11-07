@@ -5,10 +5,10 @@ import { PaseInvitado, ConfirmacionInvitado } from "./InvitadoSections";
 
 /**
  * Invitación de Ximena & Lorenzo.
- * `guest` / `companion` vienen de boda-restapi (ver app/[slug]/page.js).
+ * `guest` viene de boda-restapi (ver app/[slug]/page.js).
  * Sin invitado (ruta "/") se ocultan las secciones de pase y confirmación, igual que en Vale.
  */
-export default function Invitacion({ guest = null, companion = null }) {
+export default function Invitacion({ guest = null }) {
   return (
     <>
       <div className="loader-section">
@@ -84,7 +84,7 @@ export default function Invitacion({ guest = null, companion = null }) {
           </div>
         </section>
 
-        {guest && <PaseInvitado guest={guest} companion={companion} />}
+        {guest && <PaseInvitado guest={guest} />}
 
         <section className="dedicatoria__section paperWhite" id="acompañame">
           <div className="dedicatoria__section-container">
@@ -647,7 +647,7 @@ export default function Invitacion({ guest = null, companion = null }) {
           </div>
         </section>
 
-        {guest && <ConfirmacionInvitado guest={guest} companion={companion} />}
+        {guest && <ConfirmacionInvitado guest={guest} />}
       </main>
 
       <footer>

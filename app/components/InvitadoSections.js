@@ -11,16 +11,16 @@ const pasesTexto = (n) => {
 };
 
 /** "Familia Pérez López" / "Juan Pérez & María Gómez" (mismo formato que Vale). */
-export const nombreInvitado = (guest, companion) => {
+export const nombreInvitado = (guest) => {
   const base = [guest.primer_nombre, guest.apellido_paterno, guest.apellido_materno]
     .filter((v) => typeof v === "string" && v.trim() !== "")
     .join(" ");
-  if (!companion) return base;
-  const pareja = [companion.primer_nombre, companion.apellido_paterno].filter(Boolean).join(" ");
+  if (!guest.pareja?.nombre) return base;
+  const pareja = [guest.pareja.nombre, guest.pareja.apellido].filter(Boolean).join(" ");
   return `${base} & ${pareja}`;
 };
 
-export function PaseInvitado({ guest, companion }) {
+export function PaseInvitado({ guest }) {
   const pases = Number(guest.pases) || 0;
 
   return (
@@ -40,7 +40,7 @@ export function PaseInvitado({ guest, companion }) {
           </div>
           <div className="pasesBoda-container">
             <p className="family-name sr-bottom" id="names-general">
-              {nombreInvitado(guest, companion)}, hemos reservado con mucho cariño...
+              {nombreInvitado(guest)}, hemos reservado con mucho cariño...
             </p>
             {pases >= 1 && pases <= 10 && (
               <img
@@ -68,8 +68,8 @@ export function PaseInvitado({ guest, companion }) {
   );
 }
 
-/** Confirmación igual que Vale: botón "Aceptar" → PUT /api/invitados/confirmar. */
-export function ConfirmacionInvitado({ guest, companion }) {
+/** Confirmación igual que Vale: botón "Aceptar" → PUT /api/eventos/:evento/invitados/:slug/confirmar. */
+export function ConfirmacionInvitado({ guest }) {
   const [confirmed, setConfirmed] = useState(Boolean(guest.confirmado));
   const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
@@ -105,7 +105,7 @@ export function ConfirmacionInvitado({ guest, companion }) {
       </div>
       <div className="confirmacion__section-container">
         <div className="confirmacion-description">
-          <p>{nombreInvitado(guest, companion)}</p>
+          <p>{nombreInvitado(guest)}</p>
         </div>
         {confirmed ? (
           <div className="text-confirmacion" style={{ paddingTop: "1rem" }}>
