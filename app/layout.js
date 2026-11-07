@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Ximena & Lorenzo | Home",
+  title: "Invitación de boda",
   description: "Invitación de nuestra boda",
 };
 

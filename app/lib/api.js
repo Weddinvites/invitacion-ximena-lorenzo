@@ -33,6 +33,21 @@ export const getInvitado = cache(async (slug) => {
 });
 
 /**
+ * Ficha del evento (novios, fecha, padres, itinerario, ubicaciones, regalos, hoteles…).
+ * Con `slug`, la API agrega lo marcado solo VIP si ese invitado es VIP.
+ * Se cachea y revalida cada minuto: lo que cambien los novios en el admin aparece en ≤ 1 min.
+ * Si la API falla lanza error: Next conserva la última versión buena y, si no hay, muestra app/error.js.
+ */
+export const getFicha = cache(async (slug) => {
+  if (!API_URL) throw new Error("API_URL no está definido (ver .env.example)");
+  if (!eventoValido()) throw new Error("EVENTO_ID no está definido o es inválido");
+  const qs = slug ? `?invitado=${encodeURIComponent(slug)}` : "";
+  const res = await fetch(`${API_URL}/api/eventos/${EVENTO_ID}/ficha${qs}`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`GET ficha: ${res.status}`);
+  return res.json();
+});
+
+/**
  * RSVP: asistentes = 0 declina; 1..pases asiste con esos lugares.
  * Devuelve el invitado actualizado. Si ya había respondido (409) también lo devuelve,
  * para que la invitación muestre la respuesta que quedó guardada.

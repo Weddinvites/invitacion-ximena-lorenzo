@@ -2,13 +2,27 @@
 
 import Script from "next/script";
 import { PaseInvitado, ConfirmacionInvitado } from "./InvitadoSections";
+import Padres from "./secciones/Padres";
+import Itinerario from "./secciones/Itinerario";
+import Ubicaciones from "./secciones/Ubicaciones";
+import RegalosVestimenta from "./secciones/RegalosVestimenta";
+import Hoteles from "./secciones/Hoteles";
+import { partesFecha } from "../lib/fecha";
 
 /**
  * Invitación de Ximena & Lorenzo.
+ * `ficha` viene de boda-restapi (GET /eventos/:id/ficha): solo trae las secciones visibles
+ * (y lo VIP solo si el invitado es VIP), así que cada sección se muestra solo si viene.
  * `guest` viene de boda-restapi (ver app/[slug]/page.js).
  * Sin invitado (ruta "/") se ocultan las secciones de pase y confirmación, igual que en Vale.
  */
-export default function Invitacion({ guest = null }) {
+export default function Invitacion({ ficha, guest = null }) {
+  const { evento = {}, secciones = {} } = ficha ?? {};
+  const { novios, padres, itinerario, ubicaciones, regalos, vestimenta, hospedaje } = secciones;
+  const fecha = partesFecha(evento.fecha_evento, evento.zona_horaria);
+  const titulo = novios?.titulo ?? evento.titulo ?? "";
+  const hashtag = novios ? `#${novios.novia.nombre}Y${novios.novio.nombre}`.replace(/\s+/g, "") : null;
+
   return (
     <>
       <div className="loader-section">
@@ -41,12 +55,14 @@ export default function Invitacion({ guest = null }) {
           <div className="transparent-to-black"></div>
           <div className="mainImg mainText sr-bottom">
             <p className="mainText__kicker">Nuestra Boda</p>
-            <h1 className="mainText__names">Ximena &amp; Lorenzo</h1>
-            <p className="mainText__date">
-              <span>15</span>
-              <span>05</span>
-              <span>27</span>
-            </p>
+            <h1 className="mainText__names">{titulo}</h1>
+            {fecha && (
+              <p className="mainText__date">
+                <span>{fecha.dia}</span>
+                <span>{fecha.mes}</span>
+                <span>{fecha.anioCorto}</span>
+              </p>
+            )}
           </div>
           <div className="background-main" id="back-main"></div>
         </section>
@@ -86,40 +102,9 @@ export default function Invitacion({ guest = null }) {
 
         {guest && <PaseInvitado guest={guest} />}
 
-        <section className="dedicatoria__section paperWhite" id="acompañame">
-          <div className="dedicatoria__section-container">
-            <p className="textB sr-bottom">
-              Con la Bendición de Dios y nuestros Padres
-            </p>
+        <Padres padres={padres} />
 
-            <p className="titleNames mainTitleNames sr-bottom">
-              Padres del Novio
-            </p>
-            <p className="names sr-bottom">Sonia Espinosa Limón</p>
-            <p className="names sr-bottom">José Martín Castillo Álvarez</p>
-            <img
-              src="/assets/images/alejandra-carrasco/sep1.svg"
-              width="180px"
-              className="separadorGold sr-bottom"
-              alt=""
-            />
-            <p className="titleNames sr-bottom">Padres de la Novia</p>
-            <p className="names sr-bottom">Meiwor Martínez Nava</p>
-            <p className="names sr-bottom">
-              Cruz Mani Huitzil
-              <span>
-                <img src="/assets/images/cruz.png" width="15px" alt="" />
-              </span>
-            </p>
-            <img
-              src="/assets/images/alejandra-carrasco/sep1.svg"
-              width="180px"
-              className="separadorGold sr-bottom"
-              alt=""
-            />
-          </div>
-        </section>
-
+        {fecha && (
         <section className="timmer__section" id="music">
           <div className="transparent-to-black"></div>
           <div className="timmer__section-container">
@@ -129,11 +114,11 @@ export default function Invitacion({ guest = null }) {
               role="heading"
               aria-level={2}
             >
-              <span className="stitle__serif">Sábado 15 de Mayo</span>
+              <span className="stitle__serif">{fecha.diaSemana} {fecha.dia.replace(/^0/, "")} de {fecha.mesNombre}</span>
               <span className="stitle__script">Solo Faltan</span>
             </div>
             <div className="time-part">
-              <div className="square-container sr-bottom" id="contador">
+              <div className="square-container sr-bottom" id="contador" data-fecha={evento.fecha_evento}>
                 <div className="circular">
                   <p id="dias"></p>
                   <p className="flash">Días</p>
@@ -154,145 +139,9 @@ export default function Invitacion({ guest = null }) {
             </div>
           </div>
         </section>
+        )}
 
-        <section className="desfase-one active2">
-          <section className="dinamicItinerario__section" id="itinerario">
-            <div className="title-micancion sr-left">
-              <div
-              className="stitle "
-              style={{ "--w": "200px", "--ar": "760 / 164", "--s": 16.95, "--sy": 9.93 }}
-              role="heading"
-              aria-level={2}
-            >
-              <span className="stitle__serif">Itinerario</span>
-            </div>
-            </div>
-            <div className="dinamicItinerario__section-container">
-              <div className="icons__timeline sr-bottom">
-                <lord-icon
-                  src="https://cdn.lordicon.com/fshosubk.json"
-                  trigger="loop"
-                  delay="2000"
-                  colors="primary:#B89965,secondary:#B89965"
-                  style={{ width: "80px", height: "80px" }}
-                ></lord-icon>
-              </div>
-              <div className="timeline__line">
-                <div className="timeline__line__inner"></div>
-              </div>
-              <div className="timeline__horario">
-                <div className="circle__timeline">
-                  <ion-icon name="heart"></ion-icon>
-                </div>
-                <p className="info sr-bottom">
-                  <span>Ceremonia Religiosa</span>
-                  <br />
-                  18:00 hrs
-                </p>
-              </div>
-
-              <div className="icons__timeline sr-bottom">
-                <p className="info2 sr-bottom">
-                  <span>Recepción</span>
-                  <br />
-                  19:00 hrs
-                </p>
-              </div>
-              <div className="timeline__horario">
-                <div className="circle__timeline">
-                  <ion-icon name="heart"></ion-icon>
-                </div>
-                <lord-icon
-                  src="https://cdn.lordicon.com/rrbmabsx.json"
-                  trigger="loop"
-                  delay="2000"
-                  colors="primary:#B89965,secondary:#B89965"
-                  style={{ width: "80px", height: "80px" }}
-                ></lord-icon>
-              </div>
-
-              <div className="icons__timeline sr-bottom">
-                <lord-icon
-                  src="https://cdn.lordicon.com/nvsfzbop.json"
-                  trigger="loop"
-                  delay="2000"
-                  colors="primary:#B89965,secondary:#B89965"
-                  style={{ width: "80px", height: "80px" }}
-                ></lord-icon>
-              </div>
-              <div className="timeline__horario">
-                <div className="circle__timeline">
-                  <ion-icon name="heart"></ion-icon>
-                </div>
-                <p className="info sr-bottom">
-                  <span>Entrada de los Novios</span>
-                  <br />
-                  20:00 hrs
-                </p>
-              </div>
-
-              <div className="icons__timeline sr-bottom">
-                <p className="info2 sr-bottom">
-                  <span>Cena</span>
-                  <br />
-                  20:15 hrs
-                </p>
-              </div>
-              <div className="timeline__horario">
-                <div className="circle__timeline">
-                  <ion-icon name="heart"></ion-icon>
-                </div>
-                <lord-icon
-                  src="https://cdn.lordicon.com/hihfsmas.json"
-                  trigger="loop"
-                  delay="2000"
-                  colors="primary:#B89965,secondary:#B89965"
-                  style={{ width: "80px", height: "80px" }}
-                ></lord-icon>
-              </div>
-
-              <div className="icons__timeline sr-bottom">
-                <lord-icon
-                  src="https://cdn.lordicon.com/dedkryhs.json"
-                  trigger="loop"
-                  delay="2000"
-                  colors="primary:#B89965"
-                  style={{ width: "80px", height: "80px" }}
-                ></lord-icon>
-              </div>
-              <div className="timeline__horario">
-                <div className="circle__timeline">
-                  <ion-icon name="heart"></ion-icon>
-                </div>
-                <p className="info sr-bottom">
-                  <span>Vals</span>
-                  <br />
-                  21:30 hrs
-                </p>
-              </div>
-
-              <div className="icons__timeline sr-bottom">
-                <p className="info2 sr-bottom">
-                  <span>Fin del Evento</span>
-                  <br />
-                  03:00 hrs
-                </p>
-              </div>
-              <div className="timeline__horario">
-                <div className="circle__timeline">
-                  <ion-icon name="heart"></ion-icon>
-                </div>
-                <lord-icon
-                  src="https://cdn.lordicon.com/ilhuppkd.json"
-                  trigger="loop"
-                  delay="2000"
-                  colors="primary:#B89965,secondary:#B89965"
-                  style={{ width: "80px", height: "80px" }}
-                ></lord-icon>
-              </div>
-            </div>
-          </section>
-        </section>
+        <Itinerario itinerario={itinerario} />
 
         <section className="section__separadorGreene">
           <div className="container boxprx" data-animation="flipInX">
@@ -300,73 +149,7 @@ export default function Invitacion({ guest = null }) {
           </div>
         </section>
 
-        <section className="events__section paperWhite" id="ubicacion">
-          <div className="events__section-container" style={{ height: "60rem" }}>
-            <p className="title-event bounceInpx">Ceremonia Religiosa</p>
-            <img
-              src="/assets/images/isabel-samuel/iglesia.jpeg"
-              width="260px"
-              className="imgIglesia boxprx"
-              data-animation="zoomIn"
-              alt="Imagen de la iglesia"
-            />
-            <p className="name-event bounceInpx">
-              Catedral Metropolitana de San Luis Potosí
-            </p>
-            <p className="adress bounceInpx">
-              José María Morelos y Pavón 620, Centro Historico, 78000 San
-              Luis Potosí, S.L.P.
-            </p>
-            <p className="hour bounceInpx">18:00 hrs</p>
-            <div className="btn__map btnPulses">
-              <a
-                className="ancla-btns"
-                href="https://maps.app.goo.gl/TpzCmASMu8ArUxG16"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="textMap">
-                  <div className="mapText">
-                    <p>Ver mapa</p>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section className="events__section paperWhite" id="ubicacion">
-          <div className="events__section-container">
-            <p className="title-event bounceInpx">Recepción</p>
-            <img
-              src="/assets/images/isabel-samuel/recepcion.png"
-              width="260px"
-              className="imgIglesia boxprx"
-              data-animation="zoomIn"
-              alt="Imagen de la iglesia"
-            />
-            <p className="name-event bounceInpx">Casa Galera</p>
-            <p className="adress bounceInpx">
-              Blvrd Río Santiago, El Morro, 78430 Soledad de Graciano
-              Sánchez, S.L.P.
-            </p>
-            <p className="hour bounceInpx">19:00 hrs</p>
-            <div className="btn__map btnPulses">
-              <a
-                className="ancla-btns"
-                href="https://maps.app.goo.gl/4mpZZd8GE7FW7cx36"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="textMap">
-                  <div className="mapText">
-                    <p>Ver mapa</p>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-        </section>
+        <Ubicaciones ubicaciones={ubicaciones} />
 
         <section className="comparteredes__section" id="">
           <div className="comparteredes__section-container">
@@ -389,219 +172,14 @@ export default function Invitacion({ guest = null }) {
                 colors="primary:#ffffff,secondary:#ffffff"
                 style={{ width: "105px", height: "105px" }}
               ></lord-icon>
-              <p translate="no">#XimenaYLorenzo</p>
+              <p translate="no">{hashtag}</p>
             </div>
           </div>
         </section>
 
-        <section className="gift__section paperWhite" id="gifts">
-          <div className="gift__section-container">
-            <div className="title-micancion sr-left">
-              <div
-              className="stitle "
-              style={{ "--w": "265px", "--ar": "1060 / 340", "--s": 12.26, "--sy": 7.12, "--c": 10.11, "--cy": 21.23, "--mb": "2rem" }}
-              role="heading"
-              aria-level={2}
-            >
-              <span className="stitle__serif">Sugerencias</span>
-              <span className="stitle__script">De Regalos</span>
-            </div>
-            </div>
-            <p className="description sr-bottom">
-              Tu presencia es el mayor regalo que podemos recibir, pero si
-              deseas darnos un obsequio, cualquier detalle será apreciado
-              con todo nuestro corazón.
-            </p>
-            <img
-              src="/assets/images/liverpool-es-parte-de-mi-vida-seeklogo.svg"
-              width="220px"
-              className="liverpoolImg sr-bottom"
-              alt=""
-            />
-            <p className="text3 sr-bottom">Mesa: 51690392</p>
-            <div className="btn__map btnPulses">
-              <a
-                className="ancla-btns"
-                href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/51690392"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="textMap">
-                  <div className="mapText">
-                    <p>Ver mesa</p>
-                  </div>
-                </div>
-              </a>
-            </div>
+        <RegalosVestimenta regalos={regalos} vestimenta={vestimenta} />
 
-            <img
-              src="/assets/images/Amazon_logo.svg"
-              width="195px"
-              className="searsImg sr-bottom"
-              alt=""
-            />
-
-            <div className="btn__map btnPulses" style={{ marginBottom: "2rem" }}>
-              <a
-                className="ancla-btns"
-                href="https://www.amazon.com.mx/wedding/registry/2EN44W3H8WKM5"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <div className="textMap">
-                  <div className="mapText">
-                    <p>Ver mesa</p>
-                  </div>
-                </div>
-              </a>
-            </div>
-            <img
-              src="/assets/images/alejandra-carrasco/sep2.svg"
-              width="200px"
-              className="sep2 sr-bottom"
-              alt=""
-            />
-            <div className="title-micancion sr-left" style={{ paddingTop: "2rem" }}>
-              <div
-              className="stitle "
-              style={{ "--w": "265px", "--ar": "1060 / 336", "--s": 11.4, "--sy": 7.55, "--c": 10.11, "--cy": 19.62, "--mb": "2rem" }}
-              role="heading"
-              aria-level={2}
-            >
-              <span className="stitle__serif">Código</span>
-              <span className="stitle__script">De Vestimenta</span>
-            </div>
-            </div>
-            <p className="textF sr-bottom">Formal</p>
-            <img
-              src="/assets/images/dresscode.png"
-              width="96px"
-              className="sr-bottom"
-              alt=""
-            />
-          </div>
-        </section>
-
-        <section className="sugerenciaHotel__section paperWhite" id="hotel">
-          <div className="sugerenciaHotel__section-container">
-            <div className="title-micancion sr-left">
-              <div
-              className="stitle "
-              style={{ "--w": "245px", "--ar": "1060 / 340", "--s": 12.26, "--sy": 7.12, "--c": 10.76, "--cy": 19.43, "--mb": "2rem" }}
-              role="heading"
-              aria-level={2}
-            >
-              <span className="stitle__serif">Sugerencias</span>
-              <span className="stitle__script">De Hotel</span>
-            </div>
-            </div>
-            <section className="swiperss-section sr-bottom">
-              <div className="swiper mySwiperDedicatoria">
-                <div className="swiper-wrapper">
-                  {[
-                    {
-                      name: "Hotel Real Plaza",
-                      adress: [
-                        "Av. Venustiano Carranza 890, Centro Histórico.",
-                      ],
-                      adress2: [
-                        "Cómodo, céntrico y elegante.",
-                        "A 5 minutos caminando de la Catedral.",
-                      ],
-                      phone: "Tel: (444) 814 6969",
-                      url: "https://www.realplaza.com.mx/",
-                    },
-                    {
-                      name: "City Centro San Luis Potosí by Marriott",
-                      adress: ["Ignacio Aldama 405, Centro Histórico"],
-                      adress2: [
-                        "Diseño moderno en un edificio histórico.",
-                        "A 2 cuadras de la Catedral.",
-                      ],
-                      phone: "Tel: (444) 804 2280",
-                      url: "https://www.marriott.com/",
-                    },
-                    {
-                      name: "Hotel Panorama",
-                      adress: [
-                        "Av. Venustiano Carranza 315, Centro Histórico",
-                      ],
-                      adress2: [
-                        "Excelente ubicación y servicio.",
-                        "A 3 minutos de la Catedral.",
-                      ],
-                      phone: "Tel: (444) 812 1777",
-                      url: "https://www.hotelpanorama.com.mx/",
-                    },
-                    {
-                      name: "Gran Hotel Concordia",
-                      adress: ["Morelos 705, Centro Histórico"],
-                      adress2: [
-                        "Ideal para una estancia tranquila cerca de todo.",
-                      ],
-                      phone: "Tel: (444) 274 0870",
-                      url: "https://www.granhotelconcordia.com.mx/",
-                    },
-                  ].map((hotel, idx) => (
-                    <div className="swiper-slide" key={idx}>
-                      <div className="containerdelcontainer">
-                        <div className="hotel-container">
-                          <img
-                            src="/assets/images/hotel.png"
-                            width="97px"
-                            className="hotelImg"
-                            alt=""
-                          />
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <div key={n} className={`star${n} stars`}>
-                              <lord-icon
-                                src="https://cdn.lordicon.com/vcuhguff.json"
-                                trigger="loop"
-                                delay="2000"
-                                colors="primary:#B89965,secondary:#B89965"
-                                style={{ width: "33px", height: "33px" }}
-                              ></lord-icon>
-                            </div>
-                          ))}
-                        </div>
-                        <p className="name">{hotel.name}</p>
-                        {hotel.adress.map((line, i) => (
-                          <p className="adress" key={`a1-${i}`}>
-                            {line}
-                          </p>
-                        ))}
-                        <p className="adress">
-                          {hotel.adress2.map((line, i) => (
-                            <span key={i}>
-                              {line}
-                              {i < hotel.adress2.length - 1 && <br />}
-                            </span>
-                          ))}
-                        </p>
-                        <p className="phone">{hotel.phone}</p>
-                        <div className="btn__map btnPulses">
-                          <a
-                            className="ancla-btns"
-                            href={hotel.url}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <div className="textMap">
-                              <div className="mapText">
-                                <p>Ver Hotel</p>
-                              </div>
-                            </div>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="swiper-pagination"></div>
-              </div>
-            </section>
-          </div>
-        </section>
+        <Hoteles hospedaje={hospedaje} />
 
         <section className="collage__section">
           <div className="collage__section-container">
@@ -610,10 +188,10 @@ export default function Invitacion({ guest = null }) {
                 className="stitle stitle--navy stitle--cormorant img1"
                 style={{ "--ar": "424 / 344", "--s": 48.1, "--sy": 22, "--c": 33.7, "--cy": 76 }}
                 role="img"
-                aria-label="15 de mayo"
+                aria-label={fecha ? `${fecha.dia} de ${fecha.mesNombre.toLowerCase()}` : undefined}
               >
-                <span className="stitle__serif">15</span>
-                <span className="stitle__serif stitle__serif2">Mayo</span>
+                <span className="stitle__serif">{fecha?.dia}</span>
+                <span className="stitle__serif stitle__serif2">{fecha?.mesNombre}</span>
               </div>
             </div>
             <div className="img2 sr-just"></div>
@@ -638,10 +216,10 @@ export default function Invitacion({ guest = null }) {
                 className="stitle stitle--navy stitle--cormorant img9"
                 style={{ "--ar": "244 / 407", "--s": 117, "--sy": 25.4, "--c": 120, "--cy": 118.9 }}
                 role="img"
-                aria-label="2027"
+                aria-label={fecha?.anio}
               >
-                <span className="stitle__serif">20</span>
-                <span className="stitle__serif stitle__serif2">27</span>
+                <span className="stitle__serif">{fecha?.anio.slice(0, 2)}</span>
+                <span className="stitle__serif stitle__serif2">{fecha?.anio.slice(2)}</span>
               </div>
             </div>
           </div>

@@ -105,12 +105,14 @@ function formatearNumero(numero) {
     return numero < 10 ? '0' + numero : numero.toString();
 }
 
-// Define la fecha futura (año, mes, día, hora, minuto, segundo)
-// 15 de mayo de 2027, 5:00 PM (hora local del visitante; el mes va de 0 a 11)
-const fechaFutura = new Date(2027, 4, 15, 17, 0, 0);
-const intervalo = setInterval(actualizarContador, 1000);
+// La fecha viene de la ficha del evento (BD): data-fecha="2027-05-15T18:00:00-06:00" en #contador.
+// Al llevar el desfase de la zona del evento, la cuenta es correcta desde cualquier zona horaria.
+const contador = document.getElementById("contador");
+const fechaFutura = contador?.dataset.fecha ? new Date(contador.dataset.fecha) : null;
+const intervalo = fechaFutura ? setInterval(actualizarContador, 1000) : null;
 
 function actualizarContador() {
+    if (!fechaFutura) return;
     const fechaActual = new Date();
     const diferencia = Math.floor((fechaFutura - fechaActual) / 1000);
     if (diferencia <= 0) {
