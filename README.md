@@ -12,7 +12,7 @@ admin central: https://admin.weddinvites.com
 | `/[slug]` | Invitación personalizada: nombre, pases y botón **Aceptar** para confirmar. Si el slug no existe, responde 404 |
 
 `/[slug]` consulta `GET /api/eventos/:EVENTO_ID/invitados/:slug` (incluye la pareja, si la hay).
-**Aceptar** llama a `PUT /api/eventos/:EVENTO_ID/invitados/:slug/confirmar` desde un Server Action (`app/actions.js`).
+**RSVP**: el invitado elige cuántos de sus pases usará y pulsa **Aceptar**, o declina con *"Una disculpa, no podré asistir"*. Ambos llaman a `PUT /api/eventos/:EVENTO_ID/invitados/:slug/rsvp` (`{ asistentes }`, 0 = declina) desde un Server Action (`app/actions.js`). Solo se responde una vez; para cambiar una respuesta, regrésala a *Pendiente* en el admin.
 
 ## Desarrollo
 

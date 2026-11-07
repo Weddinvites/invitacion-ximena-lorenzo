@@ -1709,6 +1709,127 @@ header nav .toggle.active::after {
   padding-bottom: 2rem;
 }
 
+/* ── RSVP: lugares, aceptar y declinar ───────────────────────────────────── */
+.confirmacion__section .rsvp__respuesta {
+  padding: 1rem 2rem 0;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+.confirmacion__section .rsvp__respuesta .rsvp__resumen {
+  font-family: var(--Cormorant-family);
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--text-muted);
+  padding-bottom: 0;
+}
+.confirmacion__section .rsvp__cantidad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+.confirmacion__section .rsvp__pregunta {
+  font-family: var(--Cormorant-family);
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+}
+.confirmacion__section .rsvp__stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+.confirmacion__section .rsvp__step {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 2.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+}
+.confirmacion__section .rsvp__step:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: var(--text-inverse);
+}
+.confirmacion__section .rsvp__step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.confirmacion__section .rsvp__numero {
+  min-width: 7rem;
+  font-family: var(--Cormorant-family);
+  font-size: 3.4rem;
+  color: var(--text-main);
+  text-align: center;
+}
+.confirmacion__section .rsvp__numero small {
+  font-size: 1.8rem;
+  color: var(--text-muted);
+}
+.confirmacion__section .rsvp__leyenda {
+  font-family: var(--Cormorant-family);
+  font-size: 1.8rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--text-muted);
+  max-width: 42rem;
+  margin: 3rem auto 1.2rem;
+}
+.confirmacion__section .rsvp__declinar {
+  background: none;
+  border: none;
+  padding: 0.6rem 1rem;
+  font-family: var(--Cormorant-family);
+  font-size: 1.9rem;
+  color: var(--text-main);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 0.5rem;
+  cursor: pointer;
+}
+.confirmacion__section .rsvp__declinar:hover:not(:disabled) {
+  color: var(--color-accent-dark);
+}
+.confirmacion__section .rsvp__declinar:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.confirmacion__section .rsvp__confirmar-declinar {
+  width: 85%;
+  max-width: 42rem;
+  padding: 1rem 0 2rem;
+  text-align: center;
+}
+.confirmacion__section .rsvp__confirmar-declinar > p {
+  font-family: var(--Cormorant-family);
+  font-size: 2.1rem;
+  margin-bottom: 2rem;
+}
+.confirmacion__section .rsvp__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+}
+.confirmacion__section .rsvp__acciones .btns {
+  min-width: 22rem;
+  height: 3.8rem;
+  padding: 0 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #1D344B;
+  box-shadow: 15px 15px 15px 0px rgba(0, 0, 0, 0.25) inset;
+  cursor: pointer;
+}
+.confirmacion__section .rsvp__acciones .btns span {
+  font-family: var(--Cormorant-family);
+  font-size: 2rem;
+  color: white;
+}
+
 .paperWhite {
   background: url("../assets/images/fondo-papel.png");
   background-color: #ffffff;

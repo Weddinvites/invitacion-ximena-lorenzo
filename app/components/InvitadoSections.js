@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { confirmarAsistencia } from "../actions";
+import { responderInvitacion } from "../actions";
+
+// Igual que la API: 0 = pendiente, 1 = asiste, 2 = declina.
+const RSVP = { PENDIENTE: 0, ASISTE: 1, DECLINA: 2 };
+const lugares = (n) => (n === 1 ? "lugar" : "lugares");
 
 const UNIDADES = ["Cero", "Un", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve", "Diez"];
 
@@ -68,26 +72,41 @@ export function PaseInvitado({ guest }) {
   );
 }
 
-/** Confirmación igual que Vale: botón "Aceptar" → PUT /api/eventos/:evento/invitados/:slug/confirmar. */
+/**
+ * RSVP: el invitado elige cuántos de sus pases usará y acepta, o declina con
+ * "Una disculpa, no podré asistir". Solo se responde una vez; para cambiarla,
+ * los novios la regresan a pendiente desde el admin.
+ */
 export function ConfirmacionInvitado({ guest }) {
-  const [confirmed, setConfirmed] = useState(Boolean(guest.confirmado));
+  const pases = Math.max(Number(guest.pases) || 1, 1);
+  const [respuesta, setRespuesta] = useState({
+    confirmado: Number(guest.confirmado) || RSVP.PENDIENTE,
+    asistentes: guest.asistentes ?? null,
+  });
+  const [cantidad, setCantidad] = useState(pases);
+  const varios = pases > 1; // "ustedes" vs "tú"
+  const [declinando, setDeclinando] = useState(false);
   const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
 
-  const handleConfirmacion = (e) => {
-    e.preventDefault();
+  const responder = (asistentes) => {
     setError(null);
     startTransition(async () => {
-      const r = await confirmarAsistencia(guest.slug);
-      if (r.ok) {
-        setConfirmed(true);
-        if (typeof window !== "undefined" && typeof window.confetti === "function") {
-          window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
-        }
-      } else {
-        setError("No pudimos registrar tu confirmación. Intenta de nuevo en un momento.");
+      const r = await responderInvitacion(guest.slug, asistentes);
+      if (!r.ok) {
+        setError("No pudimos registrar tu respuesta. Intenta de nuevo en un momento.");
+        return;
+      }
+      setRespuesta({ confirmado: r.confirmado, asistentes: r.asistentes });
+      if (r.confirmado === RSVP.ASISTE && typeof window !== "undefined" && typeof window.confetti === "function") {
+        window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
       }
     });
+  };
+
+  const handleAceptar = (e) => {
+    e.preventDefault();
+    responder(cantidad);
   };
 
   return (
@@ -107,22 +126,94 @@ export function ConfirmacionInvitado({ guest }) {
         <div className="confirmacion-description">
           <p>{nombreInvitado(guest)}</p>
         </div>
-        {confirmed ? (
-          <div className="text-confirmacion" style={{ paddingTop: "1rem" }}>
+        {respuesta.confirmado === RSVP.ASISTE && (
+          <div className="text-confirmacion rsvp__respuesta" role="status">
             <p>¡Gracias por tu confirmación!</p>
+            <p className="rsvp__resumen">
+              Confirmamos {respuesta.asistentes} de {pases} {lugares(pases)}
+            </p>
           </div>
-        ) : (
+        )}
+
+        {respuesta.confirmado === RSVP.DECLINA && (
+          <div className="text-confirmacion rsvp__respuesta" role="status">
+            <p>Gracias por avisarnos</p>
+            <p className="rsvp__resumen">
+              {varios
+                ? "Lamentamos que no puedan acompañarnos; los tendremos muy presentes en este día tan especial."
+                : "Lamentamos que no puedas acompañarnos; te tendremos muy presente en este día tan especial."}
+            </p>
+          </div>
+        )}
+
+        {respuesta.confirmado === RSVP.PENDIENTE && (
           <div className="form__container">
             <div className="confirmacion-description">
               <p>Por favor confirma tu asistencia a nuestra boda</p>
             </div>
-            <form id="form" className="container" onSubmit={handleConfirmacion}>
-              <div className="btns-WhatsApp">
-                <button className="btn1 btns" type="submit" disabled={pending} id="submit-button">
-                  <span>{pending ? "Enviando..." : "Aceptar"}</span>
+
+            {!declinando ? (
+              <form id="form" className="container" onSubmit={handleAceptar}>
+                {pases > 1 && (
+                  <div className="rsvp__cantidad">
+                    <p className="rsvp__pregunta" id="rsvp-cantidad-label">¿Cuántos lugares ocuparán?</p>
+                    <div className="rsvp__stepper" role="group" aria-labelledby="rsvp-cantidad-label">
+                      <button
+                        type="button"
+                        className="rsvp__step"
+                        onClick={() => setCantidad((n) => Math.max(1, n - 1))}
+                        disabled={pending || cantidad <= 1}
+                        aria-label="Un lugar menos"
+                      >
+                        −
+                      </button>
+                      <output className="rsvp__numero" aria-live="polite">
+                        {cantidad}
+                        <small> de {pases}</small>
+                      </output>
+                      <button
+                        type="button"
+                        className="rsvp__step"
+                        onClick={() => setCantidad((n) => Math.min(pases, n + 1))}
+                        disabled={pending || cantidad >= pases}
+                        aria-label="Un lugar más"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="btns-WhatsApp">
+                  <button className="btn1 btns" type="submit" disabled={pending} id="submit-button">
+                    <span>{pending ? "Enviando..." : "Aceptar"}</span>
+                  </button>
+                </div>
+
+                <p className="rsvp__leyenda">
+                  Sabemos que no siempre es posible acompañarnos, y lo entendemos de corazón. Si no{" "}
+                  {varios ? "podrán venir, les" : "podrás venir, te"} pedimos la cortesía de hacérnoslo saber aquí, con
+                  toda confianza y sin ninguna pena: nos ayudará a preparar cada detalle con mucho cariño.
+                </p>
+
+                <button type="button" className="rsvp__declinar" onClick={() => setDeclinando(true)} disabled={pending}>
+                  Una disculpa, no podré asistir
                 </button>
+              </form>
+            ) : (
+              <div className="rsvp__confirmar-declinar" role="alertdialog" aria-labelledby="rsvp-declinar-titulo">
+                <p id="rsvp-declinar-titulo">¿Nos confirmas que no {varios ? "podrán" : "podrás"} acompañarnos?</p>
+                <div className="rsvp__acciones">
+                  <button type="button" className="btn1 btns" onClick={() => responder(0)} disabled={pending}>
+                    <span>{pending ? "Enviando..." : "Sí, no podré asistir"}</span>
+                  </button>
+                  <button type="button" className="rsvp__declinar" onClick={() => setDeclinando(false)} disabled={pending}>
+                    Volver
+                  </button>
+                </div>
               </div>
-            </form>
+            )}
+
             {error && (
               <p className="text-confirmacion" role="alert" style={{ color: "#a33", fontSize: "1.8rem", textAlign: "center" }}>
                 {error}

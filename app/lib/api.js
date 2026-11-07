@@ -32,18 +32,25 @@ export const getInvitado = cache(async (slug) => {
   }
 });
 
-/** Botón "Aceptar": la API confirma solo si el slug pertenece a este evento. */
-export async function confirmarInvitado(slug) {
-  if (!slug || !eventoValido()) return false;
+/**
+ * RSVP: asistentes = 0 declina; 1..pases asiste con esos lugares.
+ * Devuelve el invitado actualizado. Si ya había respondido (409) también lo devuelve,
+ * para que la invitación muestre la respuesta que quedó guardada.
+ */
+export async function responderRsvp(slug, asistentes) {
+  if (!slug || !eventoValido()) return { ok: false };
   try {
-    const res = await fetch(`${invitadoPath(slug)}/confirmar`, {
+    const res = await fetch(`${invitadoPath(slug)}/rsvp`, {
       method: "PUT",
-      headers: { Accept: "application/json" },
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ asistentes }),
       cache: "no-store",
     });
-    return res.ok;
+    const data = await res.json().catch(() => null);
+    if (res.ok || res.status === 409) return { ok: true, guest: data };
+    return { ok: false };
   } catch (error) {
-    console.error(`[api] PUT confirmar ${slug}:`, error.message);
-    return false;
+    console.error(`[api] PUT rsvp ${slug}:`, error.message);
+    return { ok: false };
   }
 }
