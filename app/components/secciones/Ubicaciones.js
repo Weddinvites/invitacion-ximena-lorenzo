@@ -1,6 +1,3 @@
-// Imagen por posición (las imágenes siguen siendo assets de esta invitación).
-const IMAGENES = ["/assets/images/isabel-samuel/iglesia.jpeg", "/assets/images/isabel-samuel/recepcion.png"];
-
 export function BotonEnlace({ href, children, style }) {
   return (
     <div className="btn__map btnPulses" style={style}>
@@ -15,25 +12,26 @@ export function BotonEnlace({ href, children, style }) {
   );
 }
 
-/** Ceremonia, recepción (y cualquier otro lugar de la ficha), cada uno con su enlace a Google Maps. */
-export default function Ubicaciones({ ubicaciones }) {
-  const items = ubicaciones?.items ?? [];
-  return items.map((u, i) => (
-    <section className="events__section paperWhite" id="ubicacion" key={i}>
-      <div className="events__section-container" style={i === 0 ? { height: "60rem" } : undefined}>
-        <p className="title-event bounceInpx">{u.titulo}</p>
+/** Un lugar del evento (ceremonia o recepción) con su enlace a Google Maps. */
+export default function Lugar({ datos, imagen, contenedorStyle }) {
+  if (!datos?.lugar) return null;
+
+  return (
+    <section className="events__section paperWhite" id="ubicacion">
+      <div className="events__section-container" style={contenedorStyle}>
+        {datos.titulo && <p className="title-event bounceInpx">{datos.titulo}</p>}
         <img
-          src={IMAGENES[Math.min(i, IMAGENES.length - 1)]}
+          src={imagen}
           width="260px"
           className="imgIglesia boxprx"
           data-animation="zoomIn"
-          alt={`Imagen de ${u.lugar}`}
+          alt={`Imagen de ${datos.lugar}`}
         />
-        <p className="name-event bounceInpx">{u.lugar}</p>
-        <p className="adress bounceInpx">{u.direccion}</p>
-        <p className="hour bounceInpx">{u.hora} hrs</p>
-        <BotonEnlace href={u.maps_url}>Ver mapa</BotonEnlace>
+        <p className="name-event bounceInpx">{datos.lugar}</p>
+        {datos.direccion && <p className="adress bounceInpx">{datos.direccion}</p>}
+        {datos.hora && <p className="hour bounceInpx">{datos.hora} hrs</p>}
+        {datos.maps_url && <BotonEnlace href={datos.maps_url}>Ver mapa</BotonEnlace>}
       </div>
     </section>
-  ));
+  );
 }

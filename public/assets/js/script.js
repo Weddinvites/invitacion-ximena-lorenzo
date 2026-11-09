@@ -75,6 +75,8 @@ const playButton = document.getElementById('play-button');
 const noAnimation = document.getElementById('send-whatsapp');
 
 
+// La canción se puede apagar desde el admin: sin ella no hay audio ni botón.
+if (audio && playButton && noAnimation) {
 audio.addEventListener('play', function() {
     /* playButton.innerHTML = '<ion-icon name="pause"></ion-icon>'; // Cambia el ícono a pausa cuando se reproduce */
     playButton.innerHTML = '<img src="./assets/images/musica-on-4.gif" alt="">';
@@ -99,6 +101,7 @@ audio.addEventListener('volumechange', function() {
         audio.play();
     }
 });
+}
 
 /* CountDown */
 function formatearNumero(numero) {
@@ -230,7 +233,7 @@ btnSello.addEventListener('click', function() {
     }, 1500);
     setTimeout(()=> {
         cardContainer.remove();
-        audio.play();
+        audio?.play();
     }, 2500);
 
     setTimeout(()=> {
@@ -405,6 +408,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const lineInnerElement = document.querySelector('.timeline__line__inner');
     const timelineHorarioElements = Array.from(document.querySelectorAll('.timeline__horario'));
 
+    if (!lineElement || !lineInnerElement) return; // Itinerario apagado o sin momentos
+
     const getOffsetTop = (element) => {
         const rect = element.getBoundingClientRect();
         return rect.top + window.pageYOffset;
@@ -503,6 +508,7 @@ function checkBoxes() {
 }
 document.addEventListener("scroll", function () {
     const parallax = document.querySelector(".background-main");
+    if (!parallax) return; // Portada apagada
     const scrollPosition = window.scrollY;
 
     // Aplica el movimiento parallax al fondo con transform

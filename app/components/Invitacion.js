@@ -4,7 +4,8 @@ import Script from "next/script";
 import { PaseInvitado, ConfirmacionInvitado } from "./InvitadoSections";
 import Padres from "./secciones/Padres";
 import Itinerario from "./secciones/Itinerario";
-import Ubicaciones from "./secciones/Ubicaciones";
+import Padrinos from "./secciones/Padrinos";
+import Lugar from "./secciones/Ubicaciones";
 import RegalosVestimenta from "./secciones/RegalosVestimenta";
 import Hoteles from "./secciones/Hoteles";
 import { partesFecha } from "../lib/fecha";
@@ -18,10 +19,12 @@ import { partesFecha } from "../lib/fecha";
  */
 export default function Invitacion({ ficha, guest = null }) {
   const { evento = {}, secciones = {} } = ficha ?? {};
-  const { novios, padres, itinerario, ubicaciones, regalos, vestimenta, hospedaje } = secciones;
+  const { novios, padres, padrinos, itinerario, ceremonia, recepcion, regalos, vestimenta, hospedaje } = secciones;
+  // La API solo envía lo que este invitado puede ver: si la clave viene, el bloque se muestra.
+  const on = (clave) => Boolean(secciones[clave]);
   const fecha = partesFecha(evento.fecha_evento, evento.zona_horaria);
   const titulo = novios?.titulo ?? evento.titulo ?? "";
-  const hashtag = novios ? `#${novios.novia.nombre}Y${novios.novio.nombre}`.replace(/\s+/g, "") : null;
+  const hashtag = novios ? `#${novios.novia?.nombre}Y${novios.novio?.nombre}`.replace(/\s+/g, "") : null;
 
   return (
     <>
@@ -51,6 +54,7 @@ export default function Invitacion({ ficha, guest = null }) {
       </div>
 
       <main>
+        {on("portada") && (
         <section className="main__section" id="home">
           <div className="transparent-to-black"></div>
           <div className="mainImg mainText sr-bottom">
@@ -66,13 +70,17 @@ export default function Invitacion({ ficha, guest = null }) {
           </div>
           <div className="background-main" id="back-main"></div>
         </section>
+        )}
 
+        {on("frase_inicio") && (
         <section className="section__separadorGreene">
           <div className="container boxprx" data-animation="flipInX">
             <p>“El día más importante de nuestras vidas ha llegado”</p>
           </div>
         </section>
+        )}
 
+        {on("cancion") && (
         <section className="music__section" id="music">
           <div className="transparent-to-black"></div>
           <div className="music__section-container">
@@ -99,12 +107,15 @@ export default function Invitacion({ ficha, guest = null }) {
             </div>
           </div>
         </section>
+        )}
 
-        {guest && <PaseInvitado guest={guest} />}
+        {guest && on("pase") && <PaseInvitado guest={guest} />}
 
         <Padres padres={padres} />
 
-        {fecha && (
+        <Padrinos padrinos={padrinos} />
+
+        {fecha && on("cuenta_regresiva") && (
         <section className="timmer__section" id="music">
           <div className="transparent-to-black"></div>
           <div className="timmer__section-container">
@@ -143,14 +154,19 @@ export default function Invitacion({ ficha, guest = null }) {
 
         <Itinerario itinerario={itinerario} />
 
+        {on("frase_final") && (
         <section className="section__separadorGreene">
           <div className="container boxprx" data-animation="flipInX">
             <p>“Esperamos verlos y compartir juntos este día especial”</p>
           </div>
         </section>
+        )}
 
-        <Ubicaciones ubicaciones={ubicaciones} />
+        <Lugar datos={ceremonia} imagen="/assets/images/isabel-samuel/iglesia.jpeg" contenedorStyle={{ height: "60rem" }} />
 
+        <Lugar datos={recepcion} imagen="/assets/images/isabel-samuel/recepcion.png" />
+
+        {on("redes") && (
         <section className="comparteredes__section" id="">
           <div className="comparteredes__section-container">
             <div className="comparteTitle sr-bottom">
@@ -176,11 +192,13 @@ export default function Invitacion({ ficha, guest = null }) {
             </div>
           </div>
         </section>
+        )}
 
         <RegalosVestimenta regalos={regalos} vestimenta={vestimenta} />
 
         <Hoteles hospedaje={hospedaje} />
 
+        {on("collage") && (
         <section className="collage__section">
           <div className="collage__section-container">
             <div className="sr-just">
@@ -224,17 +242,19 @@ export default function Invitacion({ ficha, guest = null }) {
             </div>
           </div>
         </section>
+        )}
 
-        {guest && <ConfirmacionInvitado guest={guest} />}
+        {guest && on("confirmacion") && <ConfirmacionInvitado guest={guest} />}
       </main>
 
       <footer>
         <section className="footer__section"></section>
       </footer>
 
-      <a href="#home" className="scrollup" id="scroll-up" aria-label="Volver arriba">
+      <a href={on("portada") ? "#home" : "#"} className="scrollup" id="scroll-up" aria-label="Volver arriba">
         <ion-icon name="arrow-up-outline"></ion-icon>
       </a>
+      {on("cancion") && (
       <div
         className="sendwhatsapp show-whats"
         id="send-whatsapp"
@@ -253,6 +273,7 @@ export default function Invitacion({ ficha, guest = null }) {
           </button>
         </div>
       </div>
+      )}
 
       {/* Third-party libraries, loaded in dependency order so every global
           (ScrollReveal, Swiper, gsap, ScrollTrigger, lord-icon) exists
