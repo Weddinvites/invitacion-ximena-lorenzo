@@ -3324,3 +3324,16 @@ header nav .toggle.active::after {
     padding: 0 3vw;
   }
 }
+
+/* Texto con formato de la ficha: hereda la letra de cada bloque. */
+.texto-rico p { margin: 0; }
+.texto-rico ul, .texto-rico ol { margin: 0; padding: 0; list-style-position: inside; }
+/* La viñeta nativa queda muy separada del texto centrado. */
+.texto-rico ul { list-style: none; }
+.texto-rico ul > li::before { content: "• "; }
+.texto-rico ol { list-style-type: decimal; }
+.texto-rico li p { display: inline; }
+.texto-rico a { color: inherit; text-decoration: underline; }
+.texto-rico strong { font-weight: bold; }
+.texto-rico em { font-style: italic; }
+.texto-rico u { text-decoration: underline; }

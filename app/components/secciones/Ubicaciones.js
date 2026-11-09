@@ -1,3 +1,5 @@
+import TextoRico from "./TextoRico";
+
 export function BotonEnlace({ href, children, style }) {
   return (
     <div className="btn__map btnPulses" style={style}>
@@ -31,7 +33,7 @@ export default function Lugar({ datos, contenedorStyle }) {
           />
         )}
         <p className="name-event bounceInpx">{datos.lugar}</p>
-        {datos.direccion && <p className="adress bounceInpx">{datos.direccion}</p>}
+        <TextoRico html={datos.direccion} className="adress bounceInpx" />
         {datos.hora && <p className="hour bounceInpx">{datos.hora} hrs</p>}
         {datos.maps_url && <BotonEnlace href={datos.maps_url}>Ver mapa</BotonEnlace>}
       </div>

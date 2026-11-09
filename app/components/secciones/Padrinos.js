@@ -14,9 +14,7 @@ export default function Padrinos({ padrinos }) {
           <Fragment key={i}>
             <p className={`titleNames ${i === 0 ? "mainTitleNames " : ""}sr-bottom`}>{p.rol}</p>
             {p.nombres.map((nombre, j) => (
-              <p className="names sr-bottom" key={j}>
-                {nombre}
-              </p>
+              <p className="names texto-rico sr-bottom" key={j} dangerouslySetInnerHTML={{ __html: nombre }} />
             ))}
             <img
               src="/assets/images/alejandra-carrasco/sep1.svg"

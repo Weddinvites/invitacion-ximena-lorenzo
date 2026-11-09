@@ -1,4 +1,5 @@
 import { BotonEnlace } from "./Ubicaciones";
+import TextoRico from "./TextoRico";
 
 /** Carrusel de hoteles sugeridos (Swiper lo inicializa script.js sobre .mySwiperDedicatoria). */
 export default function Hoteles({ hospedaje }) {
@@ -41,16 +42,11 @@ export default function Hoteles({ hospedaje }) {
                     </div>
                     <p className="name">{hotel.nombre}</p>
                     {hotel.direccion && <p className="adress">{hotel.direccion}</p>}
-                    {hotel.descripcion?.length > 0 && (
-                      <p className="adress">
-                        {hotel.descripcion.map((line, i) => (
-                          <span key={i}>
-                            {line}
-                            {i < hotel.descripcion.length - 1 && <br />}
-                          </span>
-                        ))}
-                      </p>
-                    )}
+                    {/* Los hoteles sin volver a guardar conservan un arreglo de renglones. */}
+                    <TextoRico
+                      html={Array.isArray(hotel.descripcion) ? hotel.descripcion.join("<br />") : hotel.descripcion}
+                      className="adress"
+                    />
                     {hotel.telefono && <p className="phone">Tel: {hotel.telefono}</p>}
                     {hotel.url && <BotonEnlace href={hotel.url}>Ver Hotel</BotonEnlace>}
                   </div>

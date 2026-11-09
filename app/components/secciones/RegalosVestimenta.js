@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import { BotonEnlace } from "./Ubicaciones";
+import TextoRico from "./TextoRico";
 
 const LOGOS = {
   liverpool: { src: "/assets/images/liverpool-es-parte-de-mi-vida-seeklogo.svg", width: "220px", className: "liverpoolImg", alt: "Liverpool" },
@@ -46,7 +47,7 @@ export default function RegalosVestimenta({ regalos, vestimenta }) {
                 <span className="stitle__script">De Regalos</span>
               </div>
             </div>
-            {regalos.texto && <p className="description sr-bottom">{regalos.texto}</p>}
+            <TextoRico html={regalos.texto} className="description sr-bottom" />
             {mesas.map((m, i) => (
               <Fragment key={i}>
                 <Mesa mesa={m} ultima={i === mesas.length - 1} />
@@ -73,7 +74,7 @@ export default function RegalosVestimenta({ regalos, vestimenta }) {
               </div>
             </div>
             <p className="textF sr-bottom">{vestimenta.codigo}</p>
-            {vestimenta.descripcion && <p className="description sr-bottom">{vestimenta.descripcion}</p>}
+            <TextoRico html={vestimenta.descripcion} className="description sr-bottom" />
             <img src="/assets/images/dresscode.png" width="96px" className="sr-bottom" alt="" />
           </>
         )}
