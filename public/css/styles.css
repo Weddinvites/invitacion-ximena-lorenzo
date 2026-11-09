@@ -1507,37 +1507,31 @@ header nav .toggle.active::after {
   align-self: center;
 }
 .collage__section .collage__section-container .img2 {
-  background: url("../assets/images/isabel-samuel/5.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 40% 50%;
 }
 .collage__section .collage__section-container .img3 {
-  background: url("../assets/images/isabel-samuel/6.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 80% 50%;
 }
 .collage__section .collage__section-container .img4 {
-  background: url("../assets/images/isabel-samuel/7.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 50% 50%;
 }
 .collage__section .collage__section-container .img6 {
-  background: url("../assets/images/isabel-samuel/8.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 50% 50%;
 }
 .collage__section .collage__section-container .img7 {
-  background: url("../assets/images/isabel-samuel/9.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 70% 50%;
 }
 .collage__section .collage__section-container .img8 {
-  background: url("../assets/images/isabel-samuel/10.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 80% 50%;

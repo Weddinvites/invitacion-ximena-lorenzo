@@ -22,6 +22,13 @@ export default function Invitacion({ ficha, guest = null }) {
   const { novios, padres, padrinos, itinerario, ceremonia, recepcion, regalos, vestimenta, hospedaje } = secciones;
   // La API solo envía lo que este invitado puede ver: si la clave viene, el bloque se muestra.
   const on = (clave) => Boolean(secciones[clave]);
+  // Foto del collage como fondo; sin foto, el recuadro queda con su color.
+  const fondoCollage = (i) => {
+    const foto = secciones.collage?.fotos?.[i];
+    return foto?.url
+      ? { backgroundImage: `url("${foto.url}")`, backgroundPosition: `${foto.x}% ${foto.y}%` }
+      : undefined;
+  };
   const fecha = partesFecha(evento.fecha_evento, evento.zona_horaria);
   const titulo = novios?.titulo ?? evento.titulo ?? "";
   const hashtag = novios ? `#${novios.novia?.nombre}Y${novios.novio?.nombre}`.replace(/\s+/g, "") : null;
@@ -162,9 +169,9 @@ export default function Invitacion({ ficha, guest = null }) {
         </section>
         )}
 
-        <Lugar datos={ceremonia} imagen="/assets/images/isabel-samuel/iglesia.jpeg" contenedorStyle={{ height: "60rem" }} />
+        <Lugar datos={ceremonia} contenedorStyle={{ height: "60rem" }} />
 
-        <Lugar datos={recepcion} imagen="/assets/images/isabel-samuel/recepcion.png" />
+        <Lugar datos={recepcion} />
 
         {on("redes") && (
         <section className="comparteredes__section" id="">
@@ -212,9 +219,9 @@ export default function Invitacion({ ficha, guest = null }) {
                 <span className="stitle__serif stitle__serif2">{fecha?.mesNombre}</span>
               </div>
             </div>
-            <div className="img2 sr-just"></div>
-            <div className="img3 sr-just"></div>
-            <div className="img4 sr-just"></div>
+            <div className="img2 sr-just" style={fondoCollage(0)}></div>
+            <div className="img3 sr-just" style={fondoCollage(1)}></div>
+            <div className="img4 sr-just" style={fondoCollage(2)}></div>
             <div className="sr-just">
               <div
                 className="stitle stitle--navy img5"
@@ -226,9 +233,9 @@ export default function Invitacion({ ficha, guest = null }) {
                 <span className="stitle__script">Wedding</span>
               </div>
             </div>
-            <div className="img6 sr-just"></div>
-            <div className="img7 sr-just"></div>
-            <div className="img8 sr-just"></div>
+            <div className="img6 sr-just" style={fondoCollage(3)}></div>
+            <div className="img7 sr-just" style={fondoCollage(4)}></div>
+            <div className="img8 sr-just" style={fondoCollage(5)}></div>
             <div className="sr-just">
               <div
                 className="stitle stitle--navy stitle--cormorant img9"

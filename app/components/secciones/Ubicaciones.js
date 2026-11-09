@@ -13,20 +13,23 @@ export function BotonEnlace({ href, children, style }) {
 }
 
 /** Un lugar del evento (ceremonia o recepción) con su enlace a Google Maps. */
-export default function Lugar({ datos, imagen, contenedorStyle }) {
+export default function Lugar({ datos, contenedorStyle }) {
   if (!datos?.lugar) return null;
 
   return (
     <section className="events__section paperWhite" id="ubicacion">
       <div className="events__section-container" style={contenedorStyle}>
         {datos.titulo && <p className="title-event bounceInpx">{datos.titulo}</p>}
-        <img
-          src={imagen}
-          width="260px"
-          className="imgIglesia boxprx"
-          data-animation="zoomIn"
-          alt={`Imagen de ${datos.lugar}`}
-        />
+        {datos.foto?.url && (
+          <img
+            src={datos.foto.url}
+            width="260px"
+            className="imgIglesia boxprx"
+            data-animation="zoomIn"
+            alt={`Imagen de ${datos.lugar}`}
+            style={{ objectPosition: `${datos.foto.x}% ${datos.foto.y}%` }}
+          />
+        )}
         <p className="name-event bounceInpx">{datos.lugar}</p>
         {datos.direccion && <p className="adress bounceInpx">{datos.direccion}</p>}
         {datos.hora && <p className="hour bounceInpx">{datos.hora} hrs</p>}
