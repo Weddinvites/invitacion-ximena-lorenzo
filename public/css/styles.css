@@ -3327,6 +3327,8 @@ header nav .toggle.active::after {
 
 /* Texto con formato de la ficha: hereda la letra de cada bloque. */
 .texto-rico p { margin: 0; }
+/* Un renglón en blanco del editor es un párrafo vacío, que sin esto no ocupa altura. */
+.texto-rico p:empty::before { content: "\00a0"; }
 .texto-rico ul, .texto-rico ol { margin: 0; padding: 0; list-style-position: inside; }
 /* La viñeta nativa queda muy separada del texto centrado. */
 .texto-rico ul { list-style: none; }
