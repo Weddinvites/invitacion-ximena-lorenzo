@@ -29,6 +29,17 @@ export default function Invitacion({ ficha, guest = null }) {
       ? { backgroundImage: `url("${foto.url}")`, backgroundPosition: `${foto.x}% ${foto.y}%` }
       : undefined;
   };
+  // Fondos de pantalla completa: la ficha los pasa al CSS; sin foto, el CSS usa la imagen del tema.
+  const fondo = (clave) => {
+    const foto = secciones[clave]?.fondo;
+    return foto?.url ? { "--fondo": `url("${foto.url}")`, "--fondo-pos": `${foto.x}% ${foto.y}%` } : undefined;
+  };
+  // Lo que la ficha deje vacío usa lo del tema.
+  const frase = (clave, porDefecto) => secciones[clave]?.texto || porDefecto;
+  const cancion = {
+    titulo: secciones.cancion?.titulo || "Falling Like The Stars - James Arthur",
+    audio: secciones.cancion?.audio?.url || "/assets/audio/JamesArthurFallingLikeTheStars.mp3",
+  };
   const fecha = partesFecha(evento.fecha_evento, evento.zona_horaria);
   const titulo = novios?.titulo ?? evento.titulo ?? "";
   const hashtag = novios ? `#${novios.novia?.nombre}Y${novios.novio?.nombre}`.replace(/\s+/g, "") : null;
@@ -75,20 +86,20 @@ export default function Invitacion({ ficha, guest = null }) {
               </p>
             )}
           </div>
-          <div className="background-main" id="back-main"></div>
+          <div className="background-main" id="back-main" style={fondo("portada")}></div>
         </section>
         )}
 
         {on("frase_inicio") && (
         <section className="section__separadorGreene">
           <div className="container boxprx" data-animation="flipInX">
-            <p>“El día más importante de nuestras vidas ha llegado”</p>
+            <p>“{frase("frase_inicio", "El día más importante de nuestras vidas ha llegado")}”</p>
           </div>
         </section>
         )}
 
         {on("cancion") && (
-        <section className="music__section" id="music">
+        <section className="music__section" id="music" style={fondo("cancion")}>
           <div className="transparent-to-black"></div>
           <div className="music__section-container">
             <div className="audio-container sr-bottom">
@@ -102,13 +113,10 @@ export default function Invitacion({ ficha, guest = null }) {
               <span className="stitle__script">Canción</span>
             </div>
               <p className="titleName sr-bottom">
-                “Falling Like The Stars - James Arthur”
+                “{cancion.titulo}”
               </p>
               <audio id="mi-audio" loop>
-                <source
-                  src="/assets/audio/JamesArthurFallingLikeTheStars.mp3"
-                  type="audio/mpeg"
-                />
+                <source src={cancion.audio} />
                 Tu navegador no admite la reproducción de audio.
               </audio>
             </div>
@@ -123,7 +131,7 @@ export default function Invitacion({ ficha, guest = null }) {
         <Padrinos padrinos={padrinos} />
 
         {fecha && on("cuenta_regresiva") && (
-        <section className="timmer__section" id="music">
+        <section className="timmer__section" id="music" style={fondo("cuenta_regresiva")}>
           <div className="transparent-to-black"></div>
           <div className="timmer__section-container">
             <div
@@ -164,7 +172,7 @@ export default function Invitacion({ ficha, guest = null }) {
         {on("frase_final") && (
         <section className="section__separadorGreene">
           <div className="container boxprx" data-animation="flipInX">
-            <p>“Esperamos verlos y compartir juntos este día especial”</p>
+            <p>“{frase("frase_final", "Esperamos verlos y compartir juntos este día especial")}”</p>
           </div>
         </section>
         )}
@@ -269,10 +277,7 @@ export default function Invitacion({ ficha, guest = null }) {
       >
         <div className="audio__container">
           <audio id="mi-audio">
-            <source
-              src="/assets/audio/JamesArthurFallingLikeTheStars.mp3"
-              type="audio/mpeg"
-            />
+            <source src={cancion.audio} />
             Tu navegador no admite la reproducción de audio.
           </audio>
           <button id="play-button">
