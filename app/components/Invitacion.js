@@ -30,9 +30,16 @@ export default function Invitacion({ ficha, guest = null }) {
       : undefined;
   };
   // Fondos de pantalla completa: la ficha los pasa al CSS; sin foto, el CSS usa la imagen del tema.
+  // Un encuadre para celular y otro para escritorio (≥1000px); sin este último se usa el de celular.
   const fondo = (clave) => {
     const foto = secciones[clave]?.fondo;
-    return foto?.url ? { "--fondo": `url("${foto.url}")`, "--fondo-pos": `${foto.x}% ${foto.y}%` } : undefined;
+    if (!foto?.url) return undefined;
+    const esc = foto.escritorio ?? foto;
+    return {
+      "--fondo": `url("${foto.url}")`,
+      "--fondo-pos": `${foto.x}% ${foto.y}%`,
+      "--fondo-pos-escritorio": `${esc.x}% ${esc.y}%`,
+    };
   };
   // Lo que la ficha deje vacío usa lo del tema.
   const frase = (clave, porDefecto) => secciones[clave]?.texto || porDefecto;

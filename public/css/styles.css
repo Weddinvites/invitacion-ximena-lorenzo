@@ -2927,8 +2927,15 @@ header nav .toggle.active::after {
   .card__container .imgCardRight {
     right: 0;
   }
+  /* Encuadre de escritorio de los fondos que vienen de la ficha. */
+  .main__section .background-main::before {
+    background-position: var(--fondo-pos-escritorio, 50% 50%);
+  }
   .music__section {
-    background-position: var(--fondo-pos, 50% 10%);
+    background-position: var(--fondo-pos-escritorio, 50% 10%);
+  }
+  .timmer__section {
+    background-position: var(--fondo-pos-escritorio, 50% 50%);
   }
   .swipper__section .swiper {
     width: 30%;
