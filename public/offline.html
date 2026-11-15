@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#1D344B">
+  <title>Sin conexión</title>
+  <style>
+    html, body { margin: 0; height: 100%; }
+    body {
+      display: grid; place-items: center; padding: 2rem; box-sizing: border-box;
+      background: #1D344B; color: #FCFAFB; text-align: center;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+    .anillo {
+      width: 88px; height: 88px; margin: 0 auto 1.5rem; border: 1.5px solid #B89965; border-radius: 50%;
+      display: grid; place-items: center; color: #B89965; font-size: 2rem;
+    }
+    h1 { font-weight: 400; font-size: 1.6rem; margin: 0 0 .75rem; }
+    p { opacity: .8; line-height: 1.5; max-width: 22rem; margin: 0 auto 1.75rem; }
+    button {
+      font: inherit; color: #1D344B; background: #B89965; border: 0; border-radius: 999px;
+      padding: .7rem 1.6rem; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="anillo" aria-hidden="true">♥</div>
+    <h1>Sin conexión</h1>
+    <p>Esta invitación aún no se guardó en tu celular. Ábrela una vez con internet y después podrás verla aunque no tengas señal.</p>
+    <button type="button" onclick="location.reload()">Reintentar</button>
+  </main>
+</body>
+</html>

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Invitacion from "../components/Invitacion";
 import { getFicha, getInvitado } from "../lib/api";
+import { metadataApp } from "../pwa/metadata";
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
@@ -9,6 +10,7 @@ export async function generateMetadata({ params }) {
   return {
     title: guest ? `${titulo} | Invitación para ${guest.primer_nombre} ${guest.apellido_paterno}` : titulo,
     robots: { index: false, follow: false },
+    ...(guest ? await metadataApp(slug) : {}),
   };
 }
 

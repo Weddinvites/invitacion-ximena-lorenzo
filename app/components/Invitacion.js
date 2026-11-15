@@ -9,6 +9,7 @@ import Lugar from "./secciones/Ubicaciones";
 import RegalosVestimenta from "./secciones/RegalosVestimenta";
 import Hoteles from "./secciones/Hoteles";
 import { partesFecha } from "../lib/fecha";
+import InstalarApp from "../pwa/InstalarApp";
 
 /**
  * Invitación de Ximena & Lorenzo.
@@ -328,6 +329,9 @@ export default function Invitacion({ ficha, guest = null }) {
         strategy="afterInteractive"
       />
       <Script src="/assets/js/script.js" strategy="afterInteractive" />
+
+      {/* App instalable y sin señal; el aviso de instalar solo en invitaciones personales. */}
+      <InstalarApp conInstalar={Boolean(guest)} />
     </>
   );
 }
