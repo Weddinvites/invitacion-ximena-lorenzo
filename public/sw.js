@@ -2,6 +2,7 @@
 // - Páginas: primero la red (para ver lo más nuevo); sin red, la última copia guardada.
 // - Archivos (CSS, JS, imágenes, letras, librerías de CDN): copia guardada al instante y se actualiza por detrás.
 // - No guarda audio (va por partes), ni peticiones que no sean GET (confirmar asistencia).
+// - Avisos (push): muestra la notificación y al tocarla abre la invitación.
 // Al cambiar VERSION se borran las copias de versiones anteriores.
 
 const VERSION = "v1";
@@ -105,5 +106,40 @@ self.addEventListener("message", (event) => {
         // Si uno falla, se guarda el resto.
       }
     }
+  })());
+});
+
+// ── Avisos (push) ─────────────────────────────────────────────────────────────
+// La API envía { titulo, texto, url, tag }. `tag` agrupa: un aviso nuevo del mismo tipo reemplaza al anterior.
+self.addEventListener("push", (event) => {
+  let d = {};
+  try {
+    d = event.data?.json() ?? {};
+  } catch {
+    d = { texto: event.data?.text() };
+  }
+  event.waitUntil(
+    self.registration.showNotification(d.titulo || "Boda Ximena & Lorenzo", {
+      body: d.texto || "",
+      icon: "/pwa/icono/192",
+      badge: "/pwa/icono/192",
+      tag: d.tag || undefined,
+      renotify: Boolean(d.tag),
+      data: { url: d.url || "/" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const destino = new URL(event.notification.data?.url || "/", self.location.origin).href;
+  event.waitUntil((async () => {
+    const abiertas = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    const misma = abiertas.find((c) => c.url.split("#")[0] === destino) ?? abiertas.find((c) => c.url.startsWith(self.location.origin));
+    if (misma) {
+      if (misma.url.split("#")[0] !== destino && "navigate" in misma) await misma.navigate(destino).catch(() => {});
+      return misma.focus();
+    }
+    return self.clients.openWindow(destino);
   })());
 });

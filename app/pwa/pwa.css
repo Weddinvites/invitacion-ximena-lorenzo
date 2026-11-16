@@ -95,3 +95,71 @@
   font-size: 0.95em;
   color: var(--text-muted, #5C7083);
 }
+
+/* Tarjeta de avisos (app/pwa/Avisos.js): va dentro de la invitación, no flotante. */
+.pwa-avisos {
+  box-sizing: border-box;
+  width: min(26em, 100%);
+  margin: 1.5em auto 0;
+  padding: 1em 1.1em;
+  border-radius: 16px;
+  border: 1px solid var(--border-light, #E8E2DF);
+  background: var(--bg-surface, #fff);
+  color: var(--text-main, #1D344B);
+  font-family: var(--Cormorant-family, serif);
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+}
+.pwa-avisos__icono {
+  color: var(--color-accent, #B89965);
+}
+.pwa-avisos__texto {
+  margin: 0.3em 0 0;
+  font-size: 1.1em;
+}
+.pwa-avisos__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4em 1em;
+  margin-top: 0.8em;
+}
+.pwa-avisos__enlace {
+  border: 0;
+  background: none;
+  padding: 0.4em;
+  color: var(--text-muted, #5C7083);
+  font-family: inherit;
+  font-size: 1em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* "Tu mesa" dentro del pase. */
+.pwa-mesa {
+  margin: 1.2em auto 0;
+  text-align: center;
+  font-size: 16px;
+}
+.pwa-mesa__etiqueta {
+  margin: 0;
+  font-family: var(--Ovo-family, serif);
+  font-size: 0.85em;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent, #B89965);
+}
+.pwa-mesa__nombre {
+  margin: 0.15em 0 0;
+  font-family: var(--Cormorant-family, serif);
+  font-size: 1.9em;
+  line-height: 1.1;
+}
+.pwa-mesa__sillas {
+  margin: 0.2em 0 0;
+  font-family: var(--Cormorant-family, serif);
+  font-size: 1.05em;
+  color: var(--text-muted, #5C7083);
+}

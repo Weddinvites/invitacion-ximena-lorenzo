@@ -69,3 +69,33 @@ export async function responderRsvp(slug, asistentes) {
     return { ok: false };
   }
 }
+
+/** Llave pública de los avisos (null si la API no tiene push). */
+export async function getClavePush() {
+  if (!API_URL) return null;
+  try {
+    const res = await fetch(`${API_URL}/api/push/clave`, { next: { revalidate: 3600 } });
+    if (!res.ok) return null;
+    return (await res.json()).clave ?? null;
+  } catch (error) {
+    console.error("[api] GET push/clave:", error.message);
+    return null;
+  }
+}
+
+/** Guarda (POST) o borra (DELETE) el dispositivo del invitado para recibir avisos. */
+export async function suscripcionPush(slug, metodo, cuerpo) {
+  if (!slug || !eventoValido()) return false;
+  try {
+    const res = await fetch(`${invitadoPath(slug)}/push`, {
+      method: metodo,
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(cuerpo),
+      cache: "no-store",
+    });
+    return res.ok;
+  } catch (error) {
+    console.error(`[api] ${metodo} push ${slug}:`, error.message);
+    return false;
+  }
+}

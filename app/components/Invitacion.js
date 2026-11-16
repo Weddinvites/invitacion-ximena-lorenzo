@@ -8,7 +8,7 @@ import Padrinos from "./secciones/Padrinos";
 import Lugar from "./secciones/Ubicaciones";
 import RegalosVestimenta from "./secciones/RegalosVestimenta";
 import Hoteles from "./secciones/Hoteles";
-import { partesFecha } from "../lib/fecha";
+import { partesFecha, diaYMes } from "../lib/fecha";
 import InstalarApp from "../pwa/InstalarApp";
 
 /**
@@ -267,7 +267,9 @@ export default function Invitacion({ ficha, guest = null }) {
         </section>
         )}
 
-        {guest && on("confirmacion") && <ConfirmacionInvitado guest={guest} />}
+        {guest && on("confirmacion") && (
+          <ConfirmacionInvitado guest={guest} fechaLimite={diaYMes(secciones.confirmacion?.fecha_limite)} />
+        )}
       </main>
 
       <footer>

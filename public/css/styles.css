@@ -1705,6 +1705,13 @@ header nav .toggle.active::after {
 }
 
 /* ── RSVP: lugares, aceptar y declinar ───────────────────────────────────── */
+.confirmacion__section .rsvp__limite {
+  font-family: var(--Cormorant-family);
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--color-accent, #B89965);
+  margin-top: 0.4rem;
+}
 .confirmacion__section .rsvp__respuesta {
   padding: 1rem 2rem 0;
   max-width: 48rem;

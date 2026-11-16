@@ -31,3 +31,11 @@ export function partesFecha(iso, timeZone = "America/Mexico_City") {
     mesNombre: capitalizar(mesNombre),
   };
 }
+
+/** '2027-05-01' → '1 de mayo' (fecha sin hora: se lee tal cual, sin zona horaria). */
+export function diaYMes(yyyyMmDd) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(yyyyMmDd ?? "")) return "";
+  return new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", day: "numeric", month: "long" }).format(
+    new Date(`${yyyyMmDd}T12:00:00Z`)
+  );
+}

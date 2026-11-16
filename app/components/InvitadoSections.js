@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { responderInvitacion } from "../actions";
+import Avisos from "../pwa/Avisos";
+import TuMesa from "../pwa/TuMesa";
 
 // Igual que la API: 0 = pendiente, 1 = asiste, 2 = declina.
 const RSVP = { PENDIENTE: 0, ASISTE: 1, DECLINA: 2 };
@@ -59,6 +61,7 @@ export function PaseInvitado({ guest }) {
                 <span id="numberId">{pasesTexto(pases)}</span>
               </p>
             )}
+            <TuMesa mesa={guest.mesa} />
             <img
               src="/assets/images/alejandra-carrasco/sep2.svg"
               width="200px"
@@ -77,7 +80,7 @@ export function PaseInvitado({ guest }) {
  * "Una disculpa, no podré asistir". Solo se responde una vez; para cambiarla,
  * los novios la regresan a pendiente desde el admin.
  */
-export function ConfirmacionInvitado({ guest }) {
+export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
   const pases = Math.max(Number(guest.pases) || 1, 1);
   const [respuesta, setRespuesta] = useState({
     confirmado: Number(guest.confirmado) || RSVP.PENDIENTE,
@@ -150,6 +153,7 @@ export function ConfirmacionInvitado({ guest }) {
           <div className="form__container">
             <div className="confirmacion-description">
               <p>Por favor confirma tu asistencia a nuestra boda</p>
+              {fechaLimite && <p className="rsvp__limite">antes del {fechaLimite}</p>}
             </div>
 
             {!declinando ? (
@@ -220,6 +224,11 @@ export function ConfirmacionInvitado({ guest }) {
               </p>
             )}
           </div>
+        )}
+
+        {/* Avisos: al confirmar que asiste, o dentro de la app instalada mientras no decline. */}
+        {respuesta.confirmado !== RSVP.DECLINA && (
+          <Avisos slug={guest.slug} soloInstalada={respuesta.confirmado !== RSVP.ASISTE} />
         )}
       </div>
     </section>
