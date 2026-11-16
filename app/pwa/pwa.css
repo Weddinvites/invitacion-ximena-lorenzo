@@ -163,3 +163,95 @@
   font-size: 1.05em;
   color: var(--text-muted, #5C7083);
 }
+
+/* Botón "Instalar la invitación" (app/pwa/BotonInstalar.js), dentro del pase. */
+.pwa-instalar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 1.4em auto 0;
+  padding: 0.6em 1.4em;
+  border: 1px solid var(--color-accent, #B89965);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--blueText-color, #1D344B);
+  font-family: var(--Cormorant-family, serif);
+  font-size: 17px;
+  cursor: pointer;
+}
+.pwa-instalar svg {
+  color: var(--color-accent, #B89965);
+}
+
+/* Guía para instalar (app/pwa/GuiaInstalar.js). */
+.pwa-guia {
+  box-sizing: border-box;
+  width: min(30em, calc(100% - 1.5em));
+  max-height: calc(100dvh - 2em);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--border-light, #E8E2DF);
+  border-radius: 20px;
+  background: var(--bg-surface, #fff);
+  color: var(--text-main, #1D344B);
+  font-family: var(--Cormorant-family, serif);
+  font-size: 16px;
+  line-height: 1.4;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.pwa-guia::backdrop {
+  background: rgba(29, 52, 75, 0.45);
+}
+.pwa-guia__caja {
+  position: relative;
+  text-align: left;
+  padding: 1.25em;
+}
+.pwa-guia__beneficios {
+  margin: 1em 0 0;
+  padding-left: 1.2em;
+  font-size: 1.05em;
+}
+.pwa-guia__beneficios li {
+  margin-top: 0.3em;
+}
+.pwa-guia__beneficios li::marker {
+  color: var(--color-accent, #B89965);
+}
+.pwa-guia__pasos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1em 0.9em;
+  margin: 1.2em 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pwa-guia__paso p {
+  margin: 0.5em 0 0;
+  text-align: center;
+  font-size: 1.02em;
+  line-height: 1.3;
+}
+.pwa-guia__dibujo {
+  max-width: 9.5em;
+  margin: 0 auto;
+}
+.pwa-guia__numero {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4em;
+  height: 1.4em;
+  margin-right: 0.35em;
+  border-radius: 50%;
+  background: var(--color-accent, #B89965);
+  color: var(--text-inverse, #fff);
+  font-size: 0.85em;
+  vertical-align: 0.1em;
+}
+.pwa-guia__nota,
+.pwa-guia__listo {
+  margin: 1.1em 0 0;
+  font-size: 0.98em;
+  color: var(--text-muted, #5C7083);
+}

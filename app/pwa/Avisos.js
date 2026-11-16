@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { clavePush, activarAvisos, desactivarAvisos } from "../actions";
+import GuiaInstalar from "./GuiaInstalar";
+import { esIOS, yaInstalada as instalada } from "./instalacion";
 import "./pwa.css";
 
 const CLAVE_CERRADO = "pwa-avisos-cerrado";
 
-const instalada = () =>
-  window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-const esIOS = () =>
-  /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const soportaPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 
 /** Llave VAPID (base64url) → bytes, como la pide pushManager.subscribe. */
@@ -32,6 +30,7 @@ async function suscripcionActual() {
 export default function Avisos({ slug, soloInstalada = false }) {
   // oculto | ios | ofrecer | trabajando | activo | bloqueado | error
   const [estado, setEstado] = useState("oculto");
+  const [guia, setGuia] = useState(false);
 
   useEffect(() => {
     let vivo = true;
@@ -105,10 +104,18 @@ export default function Avisos({ slug, soloInstalada = false }) {
           </button>
         </>
       ) : estado === "ios" ? (
-        <p className="pwa-avisos__texto">
-          ¿Quieres recibir avisos de la boda? En iPhone, agrega primero la invitación a tu pantalla de inicio
-          (Compartir → Agregar a inicio) y ábrela desde ahí.
-        </p>
+        <>
+          <p className="pwa-avisos__texto">
+            ¿Quieres recibir avisos de la boda? En iPhone, primero instala la invitación en tu pantalla de inicio
+            y ábrela desde ahí.
+          </p>
+          <div className="pwa-avisos__acciones">
+            <button type="button" className="pwa-hoja__boton" onClick={() => setGuia(true)}>
+              Ver cómo instalarla
+            </button>
+          </div>
+          <GuiaInstalar abierta={guia} onCerrar={() => setGuia(false)} />
+        </>
       ) : estado === "bloqueado" ? (
         <p className="pwa-avisos__texto">
           Los avisos están bloqueados para esta página. Puedes permitirlos en los ajustes de tu navegador.

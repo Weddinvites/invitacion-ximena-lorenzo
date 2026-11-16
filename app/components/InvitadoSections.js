@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { responderInvitacion } from "../actions";
 import Avisos from "../pwa/Avisos";
 import TuMesa from "../pwa/TuMesa";
+import BotonInstalar from "../pwa/BotonInstalar";
 
 // Igual que la API: 0 = pendiente, 1 = asiste, 2 = declina.
 const RSVP = { PENDIENTE: 0, ASISTE: 1, DECLINA: 2 };
@@ -62,6 +63,7 @@ export function PaseInvitado({ guest }) {
               </p>
             )}
             <TuMesa mesa={guest.mesa} />
+            <BotonInstalar />
             <img
               src="/assets/images/alejandra-carrasco/sep2.svg"
               width="200px"
