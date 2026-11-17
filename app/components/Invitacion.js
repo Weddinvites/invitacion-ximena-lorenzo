@@ -10,6 +10,7 @@ import RegalosVestimenta from "./secciones/RegalosVestimenta";
 import Hoteles from "./secciones/Hoteles";
 import { partesFecha, diaYMes } from "../lib/fecha";
 import InstalarApp from "../pwa/InstalarApp";
+import ChatAsistente from "../chat/ChatAsistente";
 
 /**
  * Invitación de Ximena & Lorenzo.
@@ -334,6 +335,13 @@ export default function Invitacion({ ficha, guest = null }) {
 
       {/* App instalable y sin señal; el aviso de instalar solo en invitaciones personales. */}
       <InstalarApp conInstalar={Boolean(guest)} />
+      {guest && on("asistente") && (
+        <ChatAsistente
+          slug={guest.slug}
+          nombre={guest.primer_nombre}
+          novios={novios ? `${novios.novia?.nombre} y ${novios.novio?.nombre}` : ""}
+        />
+      )}
     </>
   );
 }

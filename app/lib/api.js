@@ -99,3 +99,26 @@ export async function suscripcionPush(slug, metodo, cuerpo) {
     return false;
   }
 }
+
+/**
+ * Pregunta al asistente con IA (POST …/chat). `mensajes`: [{ role: "user" | "assistant", content }].
+ * Devuelve { ok, respuesta, restantes } o { ok: false, message } con el texto para mostrar.
+ */
+export async function chatAsistente(slug, mensajes) {
+  if (!slug || !eventoValido()) return { ok: false, message: "El asistente no está disponible." };
+  try {
+    const res = await fetch(`${invitadoPath(slug)}/chat`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ mensajes }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(45_000),
+    });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data?.respuesta) return { ok: true, respuesta: data.respuesta, restantes: data.restantes };
+    return { ok: false, message: data?.message || "El asistente no pudo responder. Inténtalo más tarde." };
+  } catch (error) {
+    console.error(`[api] POST chat ${slug}:`, error.message);
+    return { ok: false, message: "No hay conexión con el asistente. Inténtalo en un momento." };
+  }
+}
