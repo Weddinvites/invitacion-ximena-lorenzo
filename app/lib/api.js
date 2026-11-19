@@ -48,17 +48,17 @@ export const getFicha = cache(async (slug) => {
 });
 
 /**
- * RSVP: asistentes = 0 declina; 1..pases asiste con esos lugares.
+ * RSVP: { asistentes } (0 declina; 1..pases asiste con esos lugares) o { lugares } persona por persona.
  * Devuelve el invitado actualizado. Si ya había respondido (409) también lo devuelve,
  * para que la invitación muestre la respuesta que quedó guardada.
  */
-export async function responderRsvp(slug, asistentes) {
+export async function responderRsvp(slug, cuerpo) {
   if (!slug || !eventoValido()) return { ok: false };
   try {
     const res = await fetch(`${invitadoPath(slug)}/rsvp`, {
       method: "PUT",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
-      body: JSON.stringify({ asistentes }),
+      body: JSON.stringify(cuerpo),
       cache: "no-store",
     });
     const data = await res.json().catch(() => null);

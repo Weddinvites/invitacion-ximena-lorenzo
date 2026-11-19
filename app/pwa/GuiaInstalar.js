@@ -44,13 +44,17 @@ const PASOS = {
 };
 
 const BENEFICIOS = [
-  "Ábrela al instante el día de la boda, aunque no haya señal.",
-  "Recibe avisos: cuenta regresiva, cambios de último momento y tu mesa.",
-  "Sin buscar el mensaje: queda como una app en tu pantalla de inicio.",
+  "Avisos de los novios: cambios de horario, tu mesa o algún detalle de último momento.",
+  "Tu mesa y tus pases siempre a la mano, sin buscar el mensaje.",
+  "Se abre al instante el día de la boda, aunque no haya señal.",
 ];
 
-/** Guía para instalar la invitación, con pasos ilustrados para iPhone o Android. */
-export default function GuiaInstalar({ abierta, onCerrar }) {
+/**
+ * Guía para guardar la invitación en el celular, con pasos ilustrados para iPhone o Android.
+ * `obligatoria` (después de confirmar): sin ×, no se cierra con Esc ni tocando afuera; solo con
+ * `onLista`, al instalarla o al tocar «Ya la instalé» (iPhone no deja saber si se instaló).
+ */
+export default function GuiaInstalar({ abierta, onCerrar, obligatoria = false, onLista }) {
   const ref = useRef(null);
   const tituloId = useId();
   const { plataforma, puedeNativo, instalada } = useInstalacion();
@@ -60,13 +64,31 @@ export default function GuiaInstalar({ abierta, onCerrar }) {
     if (!d) return;
     if (abierta && !d.open) d.showModal();
     if (!abierta && d.open) d.close();
-  }, [abierta]);
+    if (!abierta || !obligatoria) return;
+    // Mientras sea obligatoria, la página de atrás no se desplaza.
+    const html = document.documentElement;
+    const antes = html.style.overflow;
+    html.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = antes;
+    };
+  }, [abierta, obligatoria]);
 
   const pasos = PASOS[plataforma === "android" ? "android" : "ios"];
+  const terminar = () => (obligatoria ? onLista?.() : onCerrar?.());
 
   const instalar = async () => {
     const r = await instalarNativo();
-    if (r === "accepted") onCerrar();
+    if (r === "accepted") terminar();
+  };
+
+  // Esc: la obligatoria no se cierra; si el navegador la cierra de todos modos, se vuelve a abrir.
+  const alCancelar = (e) => {
+    if (obligatoria) e.preventDefault();
+  };
+  const alCerrar = () => {
+    if (obligatoria && abierta) ref.current?.showModal();
+    else onCerrar?.();
   };
 
   return (
@@ -74,29 +96,51 @@ export default function GuiaInstalar({ abierta, onCerrar }) {
       ref={ref}
       className="pwa-guia"
       aria-labelledby={tituloId}
-      onClose={onCerrar}
-      onClick={(e) => e.target === ref.current && onCerrar()}
+      onCancel={alCancelar}
+      onClose={alCerrar}
+      onClick={(e) => !obligatoria && e.target === ref.current && onCerrar?.()}
     >
       <div className="pwa-guia__caja">
-        <button type="button" className="pwa-hoja__cerrar" onClick={onCerrar} aria-label="Cerrar">×</button>
+        {!obligatoria && (
+          <button type="button" className="pwa-hoja__cerrar" onClick={onCerrar} aria-label="Cerrar">×</button>
+        )}
         <div className="pwa-hoja__cabeza">
           {/* eslint-disable-next-line @next/next/no-img-element -- ícono generado, ya del tamaño justo */}
           <img src={ICONO} alt="" width="52" height="52" className="pwa-hoja__icono" />
-          <p id={tituloId} className="pwa-hoja__titulo">Instala la invitación</p>
+          <p id={tituloId} className="pwa-hoja__titulo">
+            {obligatoria ? "¡Gracias por confirmar! Queremos mantenerte al tanto" : "Recibe las noticias de nuestra boda"}
+          </p>
         </div>
+
+        <p className="pwa-guia__intro">
+          Antes de la boda podríamos compartirte avisos importantes. Para que te lleguen, guarda nuestra
+          invitación en tu celular: solo toma un minuto y nos ayudas a darte la mejor experiencia.
+        </p>
 
         <ul className="pwa-guia__beneficios">
           {BENEFICIOS.map((b) => <li key={b}>{b}</li>)}
         </ul>
 
         {instalada ? (
-          <p className="pwa-guia__listo">Ya la tienes instalada. Ábrela desde el ícono de tu pantalla de inicio.</p>
+          <>
+            <p className="pwa-guia__listo">¡Listo! Ya la tienes en tu celular. Ábrela desde su ícono para recibir los avisos.</p>
+            {obligatoria && (
+              <div className="pwa-hoja__acciones pwa-guia__final">
+                <button type="button" className="pwa-hoja__boton" onClick={terminar}>Continuar</button>
+              </div>
+            )}
+          </>
         ) : puedeNativo ? (
-          <div className="pwa-hoja__acciones">
-            <button type="button" className="pwa-hoja__boton" onClick={instalar}>Instalar ahora</button>
+          <div className="pwa-hoja__acciones pwa-guia__final">
+            <button type="button" className="pwa-hoja__boton" onClick={instalar}>Guardar en mi celular</button>
           </div>
         ) : (
           <>
+            <p className="pwa-guia__nota pwa-guia__nota--antes">
+              {plataforma === "ios"
+                ? "Si la abriste desde WhatsApp o Instagram, primero toca ··· o Compartir y elige «Abrir en Safari»."
+                : "Si la abriste desde WhatsApp o Instagram, primero toca ⋮ y elige «Abrir en Chrome»."}
+            </p>
             <ol className="pwa-guia__pasos">
               {pasos.map(({ paso, texto }, i) => (
                 <li key={paso} className="pwa-guia__paso">
@@ -110,11 +154,11 @@ export default function GuiaInstalar({ abierta, onCerrar }) {
                 </li>
               ))}
             </ol>
-            <p className="pwa-guia__nota">
-              {plataforma === "ios"
-                ? "Si la abriste desde WhatsApp o Instagram, primero toca ··· o Compartir y elige Abrir en Safari."
-                : "Si la abriste desde WhatsApp o Instagram, primero toca ⋮ y elige Abrir en Chrome."}
-            </p>
+            {obligatoria && (
+              <div className="pwa-hoja__acciones pwa-guia__final">
+                <button type="button" className="pwa-hoja__boton" onClick={terminar}>Ya la instalé</button>
+              </div>
+            )}
           </>
         )}
       </div>

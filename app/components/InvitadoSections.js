@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { responderInvitacion } from "../actions";
 import Avisos from "../pwa/Avisos";
 import TuMesa from "../pwa/TuMesa";
-import BotonInstalar from "../pwa/BotonInstalar";
+import AvisoInstalar from "../pwa/AvisoInstalar";
 
 // Igual que la API: 0 = pendiente, 1 = asiste, 2 = declina.
 const RSVP = { PENDIENTE: 0, ASISTE: 1, DECLINA: 2 };
@@ -16,6 +16,12 @@ const pasesTexto = (n) => {
   const palabra = UNIDADES[n] ?? String(n);
   return n === 1 ? `${palabra} lugar para ti` : `${palabra} lugares para ustedes`;
 };
+
+/** "Héctor, Adriana y Sofía" */
+const listaNombres = (nombres) =>
+  nombres.length > 1 ? `${nombres.slice(0, -1).join(", ")} y ${nombres.at(-1)}` : nombres[0] ?? "";
+
+const esFamilia = (guest) => Number(guest.tipo) === 1;
 
 /** "Familia Pérez López" / "Juan Pérez & María Gómez" (mismo formato que Vale). */
 export const nombreInvitado = (guest) => {
@@ -47,7 +53,17 @@ export function PaseInvitado({ guest }) {
           </div>
           <div className="pasesBoda-container">
             <p className="family-name sr-bottom" id="names-general">
-              {nombreInvitado(guest)}, hemos reservado con mucho cariño...
+              {esFamilia(guest) && guest.personas?.length > 0 ? (
+                <>
+                  {nombreInvitado(guest)}
+                  <span className="family-name__integrantes">
+                    {listaNombres(guest.personas.map((p) => p.primer_nombre || p.nombre))}
+                  </span>
+                  <span className="family-name__frase">hemos reservado con mucho cariño...</span>
+                </>
+              ) : (
+                <>{nombreInvitado(guest)}, hemos reservado con mucho cariño...</>
+              )}
             </p>
             {pases >= 1 && pases <= 10 && (
               <img
@@ -63,7 +79,6 @@ export function PaseInvitado({ guest }) {
               </p>
             )}
             <TuMesa mesa={guest.mesa} />
-            <BotonInstalar />
             <img
               src="/assets/images/alejandra-carrasco/sep2.svg"
               width="200px"
@@ -84,34 +99,52 @@ export function PaseInvitado({ guest }) {
  */
 export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
   const pases = Math.max(Number(guest.pases) || 1, 1);
+  const personas = guest.personas ?? [];
+  // Con un nombre por pase se elige persona por persona; si no, cuántos lugares.
+  const casillas = Boolean(guest.por_persona) && personas.length > 1;
   const [respuesta, setRespuesta] = useState({
     confirmado: Number(guest.confirmado) || RSVP.PENDIENTE,
     asistentes: guest.asistentes ?? null,
+    lugares: guest.lugares ?? null,
   });
   const [cantidad, setCantidad] = useState(pases);
+  const [elegidos, setElegidos] = useState(() => personas.map((p) => p.lugar));
+  const [recienConfirmado, setRecienConfirmado] = useState(false);
+  const alternar = (lugar) =>
+    setElegidos((l) => (l.includes(lugar) ? l.filter((x) => x !== lugar) : [...l, lugar].sort((a, b) => a - b)));
+  const quienes = (lugares) => listaNombres(personas.filter((p) => lugares.includes(p.lugar)).map((p) => p.nombre));
   const varios = pases > 1; // "ustedes" vs "tú"
   const [declinando, setDeclinando] = useState(false);
   const [error, setError] = useState(null);
   const [pending, startTransition] = useTransition();
 
-  const responder = (asistentes) => {
+  // `eleccion`: número de lugares (0 = declina) o { lugares } persona por persona.
+  const responder = (eleccion) => {
     setError(null);
     startTransition(async () => {
-      const r = await responderInvitacion(guest.slug, asistentes);
+      const r = await responderInvitacion(guest.slug, eleccion);
       if (!r.ok) {
         setError("No pudimos registrar tu respuesta. Intenta de nuevo en un momento.");
         return;
       }
-      setRespuesta({ confirmado: r.confirmado, asistentes: r.asistentes });
-      if (r.confirmado === RSVP.ASISTE && typeof window !== "undefined" && typeof window.confetti === "function") {
-        window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
+      setRespuesta({ confirmado: r.confirmado, asistentes: r.asistentes, lugares: r.lugares });
+      if (r.confirmado === RSVP.ASISTE) {
+        setRecienConfirmado(true);
+        if (typeof window !== "undefined" && typeof window.confetti === "function") {
+          window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
+        }
       }
     });
   };
 
   const handleAceptar = (e) => {
     e.preventDefault();
-    responder(cantidad);
+    if (!casillas) return responder(cantidad);
+    if (!elegidos.length) {
+      setError("Marca al menos a una persona, o elige «Una disculpa, no podré asistir».");
+      return;
+    }
+    responder({ lugares: elegidos });
   };
 
   return (
@@ -135,7 +168,9 @@ export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
           <div className="text-confirmacion rsvp__respuesta" role="status">
             <p>¡Gracias por tu confirmación!</p>
             <p className="rsvp__resumen">
-              Confirmamos {respuesta.asistentes} de {pases} {lugares(pases)}
+              {casillas && respuesta.lugares?.length
+                ? `Confirmamos a ${quienes(respuesta.lugares)}`
+                : `Confirmamos ${respuesta.asistentes} de ${pases} ${lugares(pases)}`}
             </p>
           </div>
         )}
@@ -160,7 +195,29 @@ export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
 
             {!declinando ? (
               <form id="form" className="container" onSubmit={handleAceptar}>
-                {pases > 1 && (
+                {casillas && (
+                  <div className="rsvp__cantidad">
+                    <p className="rsvp__pregunta" id="rsvp-personas-label">¿Quiénes nos acompañarán?</p>
+                    <div className="rsvp__personas" role="group" aria-labelledby="rsvp-personas-label">
+                      {personas.map((p) => (
+                        <label
+                          key={p.lugar}
+                          className={`rsvp__persona${elegidos.includes(p.lugar) ? " rsvp__persona--si" : ""}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={elegidos.includes(p.lugar)}
+                            onChange={() => alternar(p.lugar)}
+                            disabled={pending}
+                          />
+                          <span>{p.nombre}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!casillas && pases > 1 && (
                   <div className="rsvp__cantidad">
                     <p className="rsvp__pregunta" id="rsvp-cantidad-label">¿Cuántos lugares ocuparán?</p>
                     <div className="rsvp__stepper" role="group" aria-labelledby="rsvp-cantidad-label">
@@ -232,6 +289,9 @@ export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
         {respuesta.confirmado !== RSVP.DECLINA && (
           <Avisos slug={guest.slug} soloInstalada={respuesta.confirmado !== RSVP.ASISTE} />
         )}
+
+        {/* Después de confirmar: guardar la invitación en el celular para recibir los avisos. */}
+        <AvisoInstalar slug={guest.slug} activo={respuesta.confirmado === RSVP.ASISTE} recienConfirmado={recienConfirmado} />
       </div>
     </section>
   );

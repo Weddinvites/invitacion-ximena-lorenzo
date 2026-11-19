@@ -334,7 +334,7 @@ export default function Invitacion({ ficha, guest = null }) {
       <Script src="/assets/js/script.js" strategy="afterInteractive" />
 
       {/* App instalable y sin señal; el aviso de instalar solo en invitaciones personales. */}
-      <InstalarApp conInstalar={Boolean(guest)} />
+      <InstalarApp />
       {guest && on("asistente") && (
         <ChatAsistente
           slug={guest.slug}

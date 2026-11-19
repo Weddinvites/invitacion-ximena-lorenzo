@@ -4,14 +4,28 @@ import { responderRsvp, getClavePush, suscripcionPush, chatAsistente } from "./l
 
 /**
  * Respuesta de la invitación (PUT /api/eventos/:EVENTO_ID/invitados/:slug/rsvp).
- * asistentes = 0 → "No podré asistir"; 1..pases → asiste con esos lugares.
+ * `eleccion`: número (0 = "No podré asistir"; 1..pases = asiste con esos lugares)
+ * o { lugares: [0, 2] } = asisten esas personas.
  */
-export async function responderInvitacion(slug, asistentes) {
-  const n = Number(asistentes);
-  if (!Number.isInteger(n) || n < 0) return { ok: false };
-  const r = await responderRsvp(String(slug ?? ""), n);
+export async function responderInvitacion(slug, eleccion) {
+  let cuerpo;
+  if (Array.isArray(eleccion?.lugares)) {
+    const l = eleccion.lugares.map(Number);
+    if (l.length > 50 || !l.every((n) => Number.isInteger(n) && n >= 0 && n <= 50)) return { ok: false };
+    cuerpo = { lugares: l };
+  } else {
+    const n = Number(eleccion);
+    if (!Number.isInteger(n) || n < 0) return { ok: false };
+    cuerpo = { asistentes: n };
+  }
+  const r = await responderRsvp(String(slug ?? ""), cuerpo);
   if (!r.ok || !r.guest) return { ok: false };
-  return { ok: true, confirmado: Number(r.guest.confirmado), asistentes: Number(r.guest.asistentes ?? 0) };
+  return {
+    ok: true,
+    confirmado: Number(r.guest.confirmado),
+    asistentes: Number(r.guest.asistentes ?? 0),
+    lugares: Array.isArray(r.guest.lugares) ? r.guest.lugares : null,
+  };
 }
 
 /** Llave pública para suscribir el dispositivo a los avisos. */

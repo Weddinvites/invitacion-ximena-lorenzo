@@ -164,24 +164,6 @@
   color: var(--text-muted, #5C7083);
 }
 
-/* Botón "Instalar la invitación" (app/pwa/BotonInstalar.js), dentro del pase. */
-.pwa-instalar {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  margin: 1.4em auto 0;
-  padding: 0.6em 1.4em;
-  border: 1px solid var(--color-accent, #B89965);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--blueText-color, #1D344B);
-  font-family: var(--Cormorant-family, serif);
-  font-size: 17px;
-  cursor: pointer;
-}
-.pwa-instalar svg {
-  color: var(--color-accent, #B89965);
-}
 
 /* Guía para instalar (app/pwa/GuiaInstalar.js). */
 .pwa-guia {
@@ -208,8 +190,12 @@
   text-align: left;
   padding: 1.25em;
 }
+.pwa-guia__intro {
+  margin: 0.9em 0 0;
+  font-size: 1.05em;
+}
 .pwa-guia__beneficios {
-  margin: 1em 0 0;
+  margin: 0.8em 0 0;
   padding-left: 1.2em;
   font-size: 1.05em;
 }
@@ -254,4 +240,14 @@
   margin: 1.1em 0 0;
   font-size: 0.98em;
   color: var(--text-muted, #5C7083);
+}
+
+.pwa-guia__nota--antes {
+  margin-top: 1em;
+  padding: 0.6em 0.8em;
+  border-radius: 10px;
+  background: var(--bg-alt, #F9F0EF);
+}
+.pwa-guia__final {
+  margin-top: 1.2em;
 }
