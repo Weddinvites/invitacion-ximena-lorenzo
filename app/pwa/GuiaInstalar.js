@@ -51,10 +51,9 @@ const BENEFICIOS = [
 
 /**
  * Guía para guardar la invitación en el celular, con pasos ilustrados para iPhone o Android.
- * `obligatoria` (después de confirmar): sin ×, no se cierra con Esc ni tocando afuera; solo con
- * `onLista`, al instalarla o al tocar «Ya la instalé» (iPhone no deja saber si se instaló).
+ * `onLista` (opcional): al final de los pasos aparece «Ya la instalé» (iPhone no deja saber si se instaló).
  */
-export default function GuiaInstalar({ abierta, onCerrar, obligatoria = false, onLista }) {
+export default function GuiaInstalar({ abierta, onCerrar, onLista }) {
   const ref = useRef(null);
   const tituloId = useId();
   const { plataforma, puedeNativo, instalada } = useInstalacion();
@@ -64,31 +63,13 @@ export default function GuiaInstalar({ abierta, onCerrar, obligatoria = false, o
     if (!d) return;
     if (abierta && !d.open) d.showModal();
     if (!abierta && d.open) d.close();
-    if (!abierta || !obligatoria) return;
-    // Mientras sea obligatoria, la página de atrás no se desplaza.
-    const html = document.documentElement;
-    const antes = html.style.overflow;
-    html.style.overflow = "hidden";
-    return () => {
-      html.style.overflow = antes;
-    };
-  }, [abierta, obligatoria]);
+  }, [abierta]);
 
   const pasos = PASOS[plataforma === "android" ? "android" : "ios"];
-  const terminar = () => (obligatoria ? onLista?.() : onCerrar?.());
 
   const instalar = async () => {
     const r = await instalarNativo();
-    if (r === "accepted") terminar();
-  };
-
-  // Esc: la obligatoria no se cierra; si el navegador la cierra de todos modos, se vuelve a abrir.
-  const alCancelar = (e) => {
-    if (obligatoria) e.preventDefault();
-  };
-  const alCerrar = () => {
-    if (obligatoria && abierta) ref.current?.showModal();
-    else onCerrar?.();
+    if (r === "accepted") (onLista ?? onCerrar)?.();
   };
 
   return (
@@ -96,25 +77,19 @@ export default function GuiaInstalar({ abierta, onCerrar, obligatoria = false, o
       ref={ref}
       className="pwa-guia"
       aria-labelledby={tituloId}
-      onCancel={alCancelar}
-      onClose={alCerrar}
-      onClick={(e) => !obligatoria && e.target === ref.current && onCerrar?.()}
+      onClose={onCerrar}
+      onClick={(e) => e.target === ref.current && onCerrar?.()}
     >
       <div className="pwa-guia__caja">
-        {!obligatoria && (
-          <button type="button" className="pwa-hoja__cerrar" onClick={onCerrar} aria-label="Cerrar">×</button>
-        )}
+        <button type="button" className="pwa-hoja__cerrar" onClick={onCerrar} aria-label="Cerrar">×</button>
         <div className="pwa-hoja__cabeza">
           {/* eslint-disable-next-line @next/next/no-img-element -- ícono generado, ya del tamaño justo */}
           <img src={ICONO} alt="" width="52" height="52" className="pwa-hoja__icono" />
-          <p id={tituloId} className="pwa-hoja__titulo">
-            {obligatoria ? "¡Gracias por confirmar! Queremos mantenerte al tanto" : "Recibe las noticias de nuestra boda"}
-          </p>
+          <p id={tituloId} className="pwa-hoja__titulo">Recibe las noticias de nuestra boda</p>
         </div>
 
         <p className="pwa-guia__intro">
-          Antes de la boda podríamos compartirte avisos importantes. Para que te lleguen, guarda nuestra
-          invitación en tu celular: solo toma un minuto y nos ayudas a darte la mejor experiencia.
+          Guarda nuestra invitación en tu celular: solo toma un minuto y te llegarán nuestras noticias.
         </p>
 
         <ul className="pwa-guia__beneficios">
@@ -122,14 +97,7 @@ export default function GuiaInstalar({ abierta, onCerrar, obligatoria = false, o
         </ul>
 
         {instalada ? (
-          <>
-            <p className="pwa-guia__listo">¡Listo! Ya la tienes en tu celular. Ábrela desde su ícono para recibir los avisos.</p>
-            {obligatoria && (
-              <div className="pwa-hoja__acciones pwa-guia__final">
-                <button type="button" className="pwa-hoja__boton" onClick={terminar}>Continuar</button>
-              </div>
-            )}
-          </>
+          <p className="pwa-guia__listo">¡Listo! Ya la tienes en tu celular. Ábrela desde su ícono para recibir los avisos.</p>
         ) : puedeNativo ? (
           <div className="pwa-hoja__acciones pwa-guia__final">
             <button type="button" className="pwa-hoja__boton" onClick={instalar}>Guardar en mi celular</button>
@@ -154,9 +122,9 @@ export default function GuiaInstalar({ abierta, onCerrar, obligatoria = false, o
                 </li>
               ))}
             </ol>
-            {obligatoria && (
+            {onLista && (
               <div className="pwa-hoja__acciones pwa-guia__final">
-                <button type="button" className="pwa-hoja__boton" onClick={terminar}>Ya la instalé</button>
+                <button type="button" className="pwa-hoja__boton" onClick={onLista}>Ya la instalé</button>
               </div>
             )}
           </>

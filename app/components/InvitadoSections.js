@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { responderInvitacion } from "../actions";
 import Avisos from "../pwa/Avisos";
 import TuMesa from "../pwa/TuMesa";
-import AvisoInstalar from "../pwa/AvisoInstalar";
+import "./invitado.css";
 
 // Igual que la API: 0 = pendiente, 1 = asiste, 2 = declina.
 const RSVP = { PENDIENTE: 0, ASISTE: 1, DECLINA: 2 };
@@ -109,7 +109,6 @@ export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
   });
   const [cantidad, setCantidad] = useState(pases);
   const [elegidos, setElegidos] = useState(() => personas.map((p) => p.lugar));
-  const [recienConfirmado, setRecienConfirmado] = useState(false);
   const alternar = (lugar) =>
     setElegidos((l) => (l.includes(lugar) ? l.filter((x) => x !== lugar) : [...l, lugar].sort((a, b) => a - b)));
   const quienes = (lugares) => listaNombres(personas.filter((p) => lugares.includes(p.lugar)).map((p) => p.nombre));
@@ -128,11 +127,8 @@ export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
         return;
       }
       setRespuesta({ confirmado: r.confirmado, asistentes: r.asistentes, lugares: r.lugares });
-      if (r.confirmado === RSVP.ASISTE) {
-        setRecienConfirmado(true);
-        if (typeof window !== "undefined" && typeof window.confetti === "function") {
-          window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
-        }
+      if (r.confirmado === RSVP.ASISTE && typeof window !== "undefined" && typeof window.confetti === "function") {
+        window.confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
       }
     });
   };
@@ -289,9 +285,6 @@ export function ConfirmacionInvitado({ guest, fechaLimite = "" }) {
         {respuesta.confirmado !== RSVP.DECLINA && (
           <Avisos slug={guest.slug} soloInstalada={respuesta.confirmado !== RSVP.ASISTE} />
         )}
-
-        {/* Después de confirmar: guardar la invitación en el celular para recibir los avisos. */}
-        <AvisoInstalar slug={guest.slug} activo={respuesta.confirmado === RSVP.ASISTE} recienConfirmado={recienConfirmado} />
       </div>
     </section>
   );

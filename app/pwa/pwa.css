@@ -114,9 +114,29 @@
 .pwa-avisos__icono {
   color: var(--color-accent, #B89965);
 }
+.pwa-avisos__titulo {
+  margin: 0.2em 0 0;
+  font-family: var(--Ovo-family, serif);
+  font-size: clamp(15px, 4.6vw, 1.25em); /* una sola línea, aun en celulares angostos */
+  white-space: nowrap;
+  color: var(--blueText-color, #1D344B);
+}
 .pwa-avisos__texto {
   margin: 0.3em 0 0;
   font-size: 1.1em;
+}
+.pwa-avisos__beneficios {
+  display: inline-block;
+  margin: 0.6em auto 0;
+  padding-left: 1.2em;
+  font-size: 1.02em;
+  text-align: left;
+}
+.pwa-avisos__beneficios li {
+  margin-top: 0.2em;
+}
+.pwa-avisos__beneficios li::marker {
+  color: var(--color-accent, #B89965);
 }
 .pwa-avisos__acciones {
   display: flex;
@@ -163,7 +183,6 @@
   font-size: 1.05em;
   color: var(--text-muted, #5C7083);
 }
-
 
 /* Guía para instalar (app/pwa/GuiaInstalar.js). */
 .pwa-guia {

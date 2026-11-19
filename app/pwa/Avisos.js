@@ -7,6 +7,21 @@ import { esIOS, yaInstalada as instalada } from "./instalacion";
 import "./pwa.css";
 
 const CLAVE_CERRADO = "pwa-avisos-cerrado";
+// «Ya la instalé» (iPhone no deja saber si se instaló): el cuadro deja de aparecer en este teléfono.
+const claveInstalada = (slug) => `pwa-instalada:${slug}`;
+const dijoInstalada = (slug) => {
+  try {
+    return Boolean(localStorage.getItem(claveInstalada(slug)));
+  } catch {
+    return false;
+  }
+};
+
+const BENEFICIOS = [
+  "Avisos de cambios de horario o de último momento.",
+  "Tu mesa y tus pases siempre a la mano.",
+  "Se abre sin señal el día de la boda.",
+];
 
 const soportaPush = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 
@@ -37,7 +52,7 @@ export default function Avisos({ slug, soloInstalada = false }) {
     (async () => {
       if (soloInstalada && !instalada()) return;
       if (!soportaPush()) {
-        if (esIOS() && !instalada() && vivo) setEstado("ios");
+        if (esIOS() && !instalada() && !dijoInstalada(slug) && vivo) setEstado("ios");
         return;
       }
       const sub = await suscripcionActual().catch(() => undefined);
@@ -49,7 +64,7 @@ export default function Avisos({ slug, soloInstalada = false }) {
     return () => {
       vivo = false;
     };
-  }, [soloInstalada]);
+  }, [soloInstalada, slug]);
 
   const activar = async () => {
     setEstado("trabajando");
@@ -88,6 +103,16 @@ export default function Avisos({ slug, soloInstalada = false }) {
     setEstado("oculto");
   };
 
+  const yaInstalada = () => {
+    try {
+      localStorage.setItem(claveInstalada(slug), String(Date.now()));
+    } catch {}
+    setGuia(false);
+    setEstado("oculto");
+  };
+
+  const titulo = <p className="pwa-avisos__titulo">¿Quieres recibir avisos de la boda?</p>;
+
   if (estado === "oculto") return null;
 
   return (
@@ -105,16 +130,23 @@ export default function Avisos({ slug, soloInstalada = false }) {
         </>
       ) : estado === "ios" ? (
         <>
+          {titulo}
           <p className="pwa-avisos__texto">
-            ¿Quieres recibir avisos de la boda? En iPhone, primero instala la invitación en tu pantalla de inicio
-            y ábrela desde ahí.
+            Queremos mantenerte al tanto. Guarda nuestra invitación en tu celular: solo toma un minuto y te
+            llegarán nuestras noticias.
           </p>
+          <ul className="pwa-avisos__beneficios">
+            {BENEFICIOS.map((b) => <li key={b}>{b}</li>)}
+          </ul>
           <div className="pwa-avisos__acciones">
             <button type="button" className="pwa-hoja__boton" onClick={() => setGuia(true)}>
               Ver cómo instalarla
             </button>
+            <button type="button" className="pwa-avisos__enlace" onClick={yaInstalada}>
+              Ya la instalé
+            </button>
           </div>
-          <GuiaInstalar abierta={guia} onCerrar={() => setGuia(false)} />
+          <GuiaInstalar abierta={guia} onCerrar={() => setGuia(false)} onLista={yaInstalada} />
         </>
       ) : estado === "bloqueado" ? (
         <p className="pwa-avisos__texto">
@@ -122,10 +154,11 @@ export default function Avisos({ slug, soloInstalada = false }) {
         </p>
       ) : (
         <>
+          {titulo}
           <p className="pwa-avisos__texto">
             {estado === "error"
               ? "No pudimos activar los avisos. Intenta de nuevo en un momento."
-              : "¿Quieres que te avisemos de la cuenta regresiva, cambios y tu mesa?"}
+              : "Te avisaremos aquí de la cuenta regresiva, cambios de último momento y tu mesa."}
           </p>
           <div className="pwa-avisos__acciones">
             <button type="button" className="pwa-hoja__boton" onClick={activar} disabled={estado === "trabajando"}>

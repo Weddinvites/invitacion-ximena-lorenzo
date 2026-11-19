@@ -1,0 +1,81 @@
+/*
+ * Pase y confirmación por persona (InvitadoSections.js).
+ * Va empaquetado por Next (no en public/css) para que el service worker nunca sirva una copia vieja.
+ */
+
+/* Familia: nombres de los integrantes debajo del apellido. */
+.pasesBoda__section .pasesBoda-container .family-name__integrantes {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 1.9rem;
+  color: var(--text-muted);
+}
+.pasesBoda__section .pasesBoda-container .family-name__frase {
+  display: block;
+  margin-top: 1.2rem;
+}
+
+/* «¿Quiénes nos acompañarán?»: lista vertical con un check por persona.
+   Los checks llevan .form__container #form para ganarle a la regla general `#form input` de styles.css. */
+.confirmacion__section .rsvp__personas {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(32rem, 100%);
+}
+.confirmacion__section .rsvp__persona {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1rem 1.6rem;
+  border: 1px solid rgba(184, 153, 101, 0.55);
+  border-radius: 14px;
+  background: transparent;
+  font-family: var(--Cormorant-family);
+  font-size: 2rem;
+  line-height: 1.25;
+  text-align: left;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.confirmacion__section .rsvp__persona--si {
+  border-color: var(--color-accent);
+  background: rgba(184, 153, 101, 0.12);
+  color: var(--text-main);
+}
+.confirmacion__section .form__container #form .rsvp__persona input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  display: grid;
+  place-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0;
+  padding: 0; /* anula el estilo general de #form input */
+  border: 1.5px solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--bg-surface, #fff) center / 1.4rem no-repeat;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+}
+.confirmacion__section .form__container #form .rsvp__persona input:checked {
+  background-color: var(--color-accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  transform: scale(1.04);
+}
+.confirmacion__section .form__container #form .rsvp__persona input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.confirmacion__section .form__container #form .rsvp__persona input:disabled {
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confirmacion__section .rsvp__persona,
+  .confirmacion__section .form__container #form .rsvp__persona input {
+    transition: none;
+  }
+}

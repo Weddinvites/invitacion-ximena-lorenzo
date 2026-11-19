@@ -15,7 +15,7 @@ async function guardarParaSinRed() {
 
 /**
  * Registra el service worker (invitación sin señal). Ofrecer la instalación ya no va aquí:
- * se pide después de confirmar asistencia (AvisoInstalar, en la sección de confirmación).
+ * se sugiere en el cuadro de avisos, debajo de la confirmación (Avisos.js).
  */
 export default function InstalarApp() {
   useEffect(() => {
